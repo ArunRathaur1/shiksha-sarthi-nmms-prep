@@ -1,11 +1,10 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { BookOpen, Users, Science, Math } from 'lucide-react';
+import { BookOpen, Users, FlaskConical, Calculator } from 'lucide-react';
 
 const Index: React.FC = () => {
   return (
@@ -80,12 +79,12 @@ const Index: React.FC = () => {
                   description: "NMMS provides financial assistance to students from economically weaker sections."
                 },
                 {
-                  icon: <Science className="h-12 w-12 mb-4 text-edu-green" />,
+                  icon: <FlaskConical className="h-12 w-12 mb-4 text-edu-green" />,
                   title: "Comprehensive Subjects",
                   description: "The exam tests students on Mathematics, Science, Social Science, and Mental Ability."
                 },
                 {
-                  icon: <Math className="h-12 w-12 mb-4 text-edu-yellow" />,
+                  icon: <Calculator className="h-12 w-12 mb-4 text-edu-yellow" />,
                   title: "Competitive Exam",
                   description: "NMMS is a competitive scholarship exam conducted at the state level for Class 8 students."
                 }
