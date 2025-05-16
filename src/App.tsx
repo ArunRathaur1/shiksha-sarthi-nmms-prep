@@ -1,10 +1,9 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
 import { QuizProvider } from "@/contexts/QuizContext";
 
 // Pages
@@ -22,37 +21,15 @@ import PracticeQuiz from "./pages/student/PracticeQuiz";
 import QuizById from "./pages/student/QuizById";
 import GroupQuiz from "./pages/student/GroupQuiz";
 
+// Question Page
+import Upload_question from "./components/questions/Upload_question";
+
 // Teacher Pages
 import TeacherDashboard from "./pages/teacher/Dashboard";
 import CreateQuiz from "./pages/teacher/CreateQuiz";
 import Analytics from "./pages/teacher/Analytics";
 
 const queryClient = new QueryClient();
-
-// Route guard for protected routes
-const ProtectedRoute = ({ 
-  element, 
-  requiredRole, 
-}: { 
-  element: React.ReactNode, 
-  requiredRole: 'student' | 'teacher' | null
-}) => {
-  const { user, isAuthenticated, isLoading } = useAuth();
-  
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-  
-  if (!isAuthenticated) {
-    return <Navigate to="/login" />;
-  }
-  
-  if (requiredRole && user?.role !== requiredRole) {
-    return <Navigate to="/not-authorized" />;
-  }
-  
-  return element;
-};
 
 const AppRoutes = () => {
   return (
@@ -63,43 +40,20 @@ const AppRoutes = () => {
       <Route path="/register" element={<Register />} />
       <Route path="/about" element={<About />} />
       <Route path="/not-authorized" element={<NotAuthorized />} />
-      
+      <Route path="/uploadquestion" element={<Upload_question />} />
+
       {/* Student Routes */}
-      <Route 
-        path="/student" 
-        element={<ProtectedRoute element={<StudentDashboard />} requiredRole="student" />} 
-      />
-      <Route 
-        path="/student/practice" 
-        element={<ProtectedRoute element={<StudentPractice />} requiredRole="student" />} 
-      />
-      <Route 
-        path="/student/practice/:subject" 
-        element={<ProtectedRoute element={<PracticeQuiz />} requiredRole="student" />} 
-      />
-      <Route 
-        path="/student/quiz" 
-        element={<ProtectedRoute element={<QuizById />} requiredRole="student" />} 
-      />
-      <Route 
-        path="/student/group-quiz" 
-        element={<ProtectedRoute element={<GroupQuiz />} requiredRole="student" />} 
-      />
-      
+      <Route path="/student" element={<StudentDashboard />} />
+      <Route path="/student/practice" element={<StudentPractice />} />
+      <Route path="/student/practice/:subject" element={<PracticeQuiz />} />
+      <Route path="/student/quiz" element={<QuizById />} />
+      <Route path="/student/group-quiz" element={<GroupQuiz />} />
+
       {/* Teacher Routes */}
-      <Route 
-        path="/teacher" 
-        element={<ProtectedRoute element={<TeacherDashboard />} requiredRole="teacher" />} 
-      />
-      <Route 
-        path="/teacher/create-quiz" 
-        element={<ProtectedRoute element={<CreateQuiz />} requiredRole="teacher" />} 
-      />
-      <Route 
-        path="/teacher/analytics" 
-        element={<ProtectedRoute element={<Analytics />} requiredRole="teacher" />} 
-      />
-      
+      <Route path="/teacher" element={<TeacherDashboard />} />
+      <Route path="/teacher/create-quiz" element={<CreateQuiz />} />
+      <Route path="/teacher/analytics" element={<Analytics />} />
+
       {/* 404 - Not Found */}
       <Route path="*" element={<NotFound />} />
     </Routes>
