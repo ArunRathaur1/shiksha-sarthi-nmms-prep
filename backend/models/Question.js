@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const questionSchema = new mongoose.Schema({
   subject: { type: String, required: true },
   class: { type: String, required: true },
+  topic: {type:String, requires: true},
   question: { type: String, required: true },
   questionImage: {
     type: String,
