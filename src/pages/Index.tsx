@@ -24,7 +24,7 @@ const Index: React.FC = () => {
                   A comprehensive learning platform designed specifically for government school students of Classes 6, 7, and 8 to excel in the NMMS examination.
                 </p>
                 <div className="flex flex-wrap gap-4">
-                  <Link to="/register">
+                  {/* <Link to="/register">
                     <Button size="lg" className="bg-edu-blue hover:bg-edu-blue-dark">
                       Join as Student
                     </Button>
@@ -33,7 +33,7 @@ const Index: React.FC = () => {
                     <Button size="lg" variant="outline">
                       Join as Teacher
                     </Button>
-                  </Link>
+                  </Link> */}
                 </div>
               </div>
               

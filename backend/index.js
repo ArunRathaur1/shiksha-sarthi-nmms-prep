@@ -1,8 +1,14 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const question =require('./routes/question');
 const cors = require("cors");
 require("dotenv").config();
+
+const questionRoutes = require("./routes/question");
+const quizRoutes = require("./routes/quiz");
+const studentRoutes = require("./routes/student");
+const teacherRoutes = require("./routes/teacher");
+const reportRoutes = require("./routes/report");
+const schoolRoutes = require("./routes/school");
 
 const app = express();
 app.use(cors());
@@ -19,7 +25,16 @@ mongoose
   .catch((err) => {
     console.error("❌ MongoDB connection error:", err);
   });
-  app.use('/question',question);
+
+app.use("/questions", questionRoutes);
+app.use("/quizzes", quizRoutes);
+app.use("/students", studentRoutes);
+app.use("/teachers", teacherRoutes);
+app.use("/reports", reportRoutes);
+app.use("/schools", schoolRoutes);
+
+
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
