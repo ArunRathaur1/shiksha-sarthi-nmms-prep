@@ -7,7 +7,24 @@ const studentSchema = new mongoose.Schema({
   schoolId: { type: String, ref: "School" },
   password: String,
   class: String,
-  quizAttempted: [{ type: String, ref: "Quiz" }],
+  quizAttempted: [
+    {
+      quizId: { type: String, ref: "Quiz" },
+      answers: [
+        {
+          questionId: { type: String, ref: "Question" },
+          selectedAnswer: String,
+          isCorrect: Boolean // Optional, helpful for scoring
+        }
+      ],
+      score: {
+        correct: Number,
+        incorrect: Number,
+        unattempted: Number
+      },
+      attemptedAt: { type: Date, default: Date.now }
+    }
+  ]
 });
 
 module.exports = mongoose.model("Student", studentSchema);
