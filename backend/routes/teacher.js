@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Teacher = require("../models/Teacher");
+const Quiz = require("../models/Quiz");
 
 // Create a new teacher
 router.post("/", async (req, res) => {
@@ -56,6 +57,28 @@ router.delete("/:id", async (req, res) => {
     res.status(200).json({ message: "Teacher deleted successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+router.post("/:teacherId/create-quiz", async (req, res) => {
+  try {
+    const teacher = await Teacher.findOne({ teacherId: req.params.teacherId });
+    if (!teacher) return res.status(404).json({ message: "Teacher not found" });
+
+    const quizData = {
+      ...req.body,
+      teacherId: req.params.teacherId,
+    };
+
+    const quiz = new Quiz(quizData);
+    await quiz.save();
+
+    teacher.quizzesCreated.push(quiz._id);
+    await teacher.save();
+
+    res.status(201).json(quiz);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
   }
 });
 
