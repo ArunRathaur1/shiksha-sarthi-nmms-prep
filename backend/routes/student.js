@@ -14,6 +14,39 @@ router.post("/", async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
+router.post("/login", async (req, res) => {
+  try {
+    const { studentId, password } = req.body;
+
+    // Check for missing fields
+    if (!studentId || !password) {
+      return res
+        .status(400)
+        .json({ error: "Student ID and password are required" });
+    }
+
+    // Find student by studentId
+    const student = await Student.findOne({ studentId });
+
+    // If not found or password doesn't match
+    if (!student || student.password !== password) {
+      return res.status(401).json({ error: "Invalid student ID or password" });
+    }
+
+    // Login successful
+    res.status(200).json({
+      message: "Login successful",
+      student: {
+        _id: student._id,
+        studentId: student.studentId,
+        name: student.name,
+        quizAttempted: student.quizAttempted,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Server error: " + err.message });
+  }
+});
 
 // Get all students
 router.get("/", async (req, res) => {

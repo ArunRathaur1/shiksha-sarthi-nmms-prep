@@ -13,6 +13,41 @@ router.post("/", async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
+router.post("/login", async (req, res) => {
+  const { teacherId, password } = req.body;
+
+  if (!teacherId || !password) {
+    return res
+      .status(400)
+      .json({ error: "Teacher ID and password are required." });
+  }
+
+  try {
+    const teacher = await Teacher.findOne({ teacherId });
+
+    if (!teacher) {
+      return res.status(401).json({ error: "Invalid Teacher ID or password." });
+    }
+
+    // Plaintext password check for now (replace with hashed password check in production)
+    if (teacher.password !== password) {
+      return res.status(401).json({ error: "Invalid Teacher ID or password." });
+    }
+
+    res.status(200).json({
+      message: "Login successful",
+      teacher: {
+        _id: teacher._id,
+        teacherId: teacher.teacherId,
+        name: teacher.name,
+        // include any other fields you want
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 
 // Get all teachers
 router.get("/", async (req, res) => {
