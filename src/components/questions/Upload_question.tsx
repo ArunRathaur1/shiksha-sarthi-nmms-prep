@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 export default function SimpleQuestionForm() {
   const initialFormState = {
@@ -99,7 +99,7 @@ export default function SimpleQuestionForm() {
     setUploading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/question", {
+      const response = await fetch("http://localhost:5000/questions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
