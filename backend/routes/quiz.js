@@ -26,13 +26,16 @@ router.get("/", async (req, res) => {
 // Get quiz by ID
 router.get("/:id", async (req, res) => {
   try {
-    const quiz = await Quiz.findById(req.params.id).populate("questions");
+    const quiz = await Quiz.findOne({ quizId: req.params.id }).populate(
+      "questions"
+    );
     if (!quiz) return res.status(404).json({ message: "Quiz not found" });
     res.status(200).json(quiz);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 // Update quiz by ID
 router.put("/:id", async (req, res) => {

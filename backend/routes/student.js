@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Student = require("../models/Student");
 const Question = require("../models/Question");
+const Quiz = require("../models/Quiz");
 
 // Create a new student
 router.post("/", async (req, res) => {
@@ -11,6 +12,39 @@ router.post("/", async (req, res) => {
     res.status(201).json(student);
   } catch (err) {
     res.status(400).json({ error: err.message });
+  }
+});
+router.post("/login", async (req, res) => {
+  try {
+    const { studentId, password } = req.body;
+
+    // Check for missing fields
+    if (!studentId || !password) {
+      return res
+        .status(400)
+        .json({ error: "Student ID and password are required" });
+    }
+
+    // Find student by studentId
+    const student = await Student.findOne({ studentId });
+
+    // If not found or password doesn't match
+    if (!student || student.password !== password) {
+      return res.status(401).json({ error: "Invalid student ID or password" });
+    }
+
+    // Login successful
+    res.status(200).json({
+      message: "Login successful",
+      student: {
+        _id: student._id,
+        studentId: student.studentId,
+        name: student.name,
+        quizAttempted: student.quizAttempted,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Server error: " + err.message });
   }
 });
 
@@ -67,10 +101,16 @@ router.patch("/:id/attempt-quiz", async (req, res) => {
     const student = await Student.findOne({ studentId: req.params.id });
     if (!student) return res.status(404).json({ message: "Student not found" });
 
+    const quiz = await Quiz.findOne({ quizId });
+    if (!quiz) return res.status(404).json({ message: "Quiz not found" });
+
     let correct = 0, incorrect = 0, unattempted = 0;
     const evaluatedAnswers = [];
 
     for (const answer of answers) {
+      const quizQuestionIds = quiz.questions.map(q => q.toString());
+      if (!quizQuestionIds.includes(answer.questionId.toString())) continue;
+
       const question = await Question.findById(answer.questionId);
       if (!question) continue;
 
@@ -96,7 +136,6 @@ router.patch("/:id/attempt-quiz", async (req, res) => {
 
     const score = { correct, incorrect, unattempted };
 
-    // Check if quiz already attempted
     const index = student.quizAttempted.findIndex(q => q.quizId === quizId);
     if (index !== -1) {
       student.quizAttempted[index].answers = evaluatedAnswers;
@@ -107,6 +146,11 @@ router.patch("/:id/attempt-quiz", async (req, res) => {
         answers: evaluatedAnswers,
         score
       });
+    }
+
+    if (!quiz.attemptedBy.includes(student.studentId)) {
+      quiz.attemptedBy.push(student.studentId);
+      await quiz.save();
     }
 
     await student.save();

@@ -20,6 +20,8 @@ import StudentPractice from "./pages/student/Practice";
 import PracticeQuiz from "./pages/student/PracticeQuiz";
 import QuizById from "./pages/student/QuizById";
 import GroupQuiz from "./pages/student/GroupQuiz";
+import StudentReport from "./pages/student/StudentReport";
+import SingleQuizReport from "./pages/student/SingleQuizReport";
 
 // Question Page
 import Upload_question from "./components/questions/Upload_question";
@@ -29,6 +31,8 @@ import TeacherDashboard from "./pages/teacher/Dashboard";
 import CreateQuiz from "./pages/teacher/CreateQuiz";
 import Analytics from "./pages/teacher/Analytics";
 
+//Quiz
+import AttemptQuiz from "./pages/student/AttemptQuiz";
 const queryClient = new QueryClient();
 
 const AppRoutes = () => {
@@ -48,6 +52,12 @@ const AppRoutes = () => {
       <Route path="/student/practice/:subject" element={<PracticeQuiz />} />
       <Route path="/student/quiz" element={<QuizById />} />
       <Route path="/student/group-quiz" element={<GroupQuiz />} />
+      <Route path='/studentreport/:id' element={<StudentReport></StudentReport>}></Route>
+      <Route path='/singlequiz/:id' element={<SingleQuizReport></SingleQuizReport>}></Route>
+
+
+      {/* Quiz */}
+      <Route path="/attemptquiz/:id" element={<AttemptQuiz></AttemptQuiz>}></Route>
 
       {/* Teacher Routes */}
       <Route path="/teacher" element={<TeacherDashboard />} />
