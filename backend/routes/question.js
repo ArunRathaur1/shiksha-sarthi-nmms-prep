@@ -52,6 +52,32 @@ router.post("/", async (req, res) => {
 });
 
 
+router.post("/teacher", async (req, res) => {
+  try {
+    const { teacherId, questionData } = req.body;
+
+    if (!teacherId || !questionData) {
+      return res
+        .status(400)
+        .json({ error: "Missing teacherId or questionData" });
+    }
+
+    // Create new question with teacherId
+    const newQuestion = new Question({
+      ...questionData,
+      teacherId: teacherId, // your custom teacherId string
+    });
+
+    await newQuestion.save();
+
+    res.status(201).json(newQuestion);
+  } catch (err) {
+    console.error("Error saving question:", err.message);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+
 router.get("/", async (req, res) => {
   try {
     const questions = await Question.find();

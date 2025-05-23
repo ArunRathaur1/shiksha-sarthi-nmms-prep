@@ -30,6 +30,7 @@ import Upload_question from "./components/questions/Upload_question";
 import TeacherDashboard from "./pages/teacher/Dashboard";
 import CreateQuiz from "./pages/teacher/CreateQuiz";
 import Analytics from "./pages/teacher/Analytics";
+import AddMyQuestion from "./pages/teacher/AddMyquestion";
 
 //Quiz
 import AttemptQuiz from "./pages/student/AttemptQuiz";
@@ -63,6 +64,7 @@ const AppRoutes = () => {
       <Route path="/teacher" element={<TeacherDashboard />} />
       <Route path="/teacher/create-quiz" element={<CreateQuiz />} />
       <Route path="/teacher/analytics" element={<Analytics />} />
+      <Route path="/addmyquestion"element={<AddMyQuestion></AddMyQuestion>}></Route>
 
       {/* 404 - Not Found */}
       <Route path="*" element={<NotFound />} />

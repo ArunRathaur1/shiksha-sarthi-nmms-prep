@@ -32,38 +32,52 @@ interface QuizAttempt {
 }
 
 const SingleQuizReport: React.FC = () => {
-  const { id } = useParams(); // index from route
+  const { id } = useParams(); // This is the quizId
   const [quiz, setQuiz] = useState<QuizAttempt | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const cookieData = Cookies.get("student");
-    if (!cookieData || id === undefined) return;
+    const fetchQuizReport = async () => {
+      try {
+        const cookieData = Cookies.get("student");
+        if (!cookieData) throw new Error("No student cookie found");
 
-    try {
-      const parsed = JSON.parse(cookieData);
-      const quizAttempt: QuizAttempt =
-        parsed.student.quizAttempted[parseInt(id)];
-      setQuiz(quizAttempt);
+        const student = JSON.parse(cookieData);
+        const studentId = student.student.studentId;
 
-      const fetchQuestions = async () => {
+        const studentRes = await axios.get(
+          `http://localhost:5000/students/${studentId}`
+        );
+
+        const studentData = studentRes.data;
+        const quizAttempt: QuizAttempt | undefined =
+          studentData.quizAttempted.find(
+            (attempt: QuizAttempt) => attempt.quizId === id
+          );
+
+        if (!quizAttempt) throw new Error("Quiz not found");
+
+        setQuiz(quizAttempt);
+
+        // Fetch all question details
         const questionIds = quizAttempt.answers.map((ans) => ans.questionId);
         const responses = await Promise.all(
           questionIds.map((qid) =>
             axios.get(`http://localhost:5000/questions/${qid}`)
           )
         );
+
         const questionData = responses.map((res) => res.data);
         setQuestions(questionData);
+      } catch (err) {
+        console.error("Error fetching quiz report:", err);
+      } finally {
         setLoading(false);
-      };
+      }
+    };
 
-      fetchQuestions();
-    } catch (err) {
-      console.error("Error loading quiz data", err);
-      setLoading(false);
-    }
+    if (id) fetchQuizReport();
   }, [id]);
 
   if (loading) {
@@ -77,7 +91,7 @@ const SingleQuizReport: React.FC = () => {
   if (!quiz) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <p>No quiz data found.</p>
+        <p>No quiz data found for this quiz ID.</p>
       </div>
     );
   }
@@ -100,7 +114,6 @@ const SingleQuizReport: React.FC = () => {
         const answer = quiz.answers.find(
           (ans) => ans.questionId === question._id
         );
-
         const isCorrect = answer?.isCorrect;
         const selected = answer?.selectedAnswer;
 

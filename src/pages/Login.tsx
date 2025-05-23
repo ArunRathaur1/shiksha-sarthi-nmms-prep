@@ -52,11 +52,19 @@ const Login: React.FC = () => {
       const response = await axios.post(url, payload);
 
       // ✅ Store login data in cookie
-      Cookies.set(role, JSON.stringify(response.data), {
-        expires: 7,
-        secure: true,
-        sameSite: "strict",
-      });
+      if (role === "teacher") {
+        Cookies.set("teacher", JSON.stringify(response.data), {
+          expires: 7,
+          secure: true,
+          sameSite: "strict",
+        });
+      } else {
+        Cookies.set("student", JSON.stringify(response.data), {
+          expires: 7,
+          secure: true,
+          sameSite: "strict",
+        });
+      }
 
       toast({
         title: "Success",
@@ -77,6 +85,7 @@ const Login: React.FC = () => {
       setIsLoading(false);
     }
   };
+  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">

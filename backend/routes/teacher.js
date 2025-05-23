@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Teacher = require("../models/Teacher");
 const Quiz = require("../models/Quiz");
+const Question = require("../models/Question");
 
 // Create a new teacher
 router.post("/", async (req, res) => {
@@ -13,6 +14,30 @@ router.post("/", async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
+router.post("/addquestion", async (req, res) => {
+  const { teacherId, questionData } = req.body;
+
+  try {
+    const teacher = await Teacher.findOne({ teacherId });
+    if (!teacher) {
+      return res.status(404).json({ error: "Teacher not found" });
+    }
+
+    // Push questionData directly to the embedded array
+    teacher.questionAdded.push(questionData);
+    await teacher.save();
+
+    res
+      .status(201)
+      .json({
+        message: "Question added to teacher successfully",
+        question: questionData,
+      });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 router.post("/login", async (req, res) => {
   const { teacherId, password } = req.body;
 

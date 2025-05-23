@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Cookies from "js-cookie";
+import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Card,
@@ -37,17 +38,28 @@ const StudentDashboard: React.FC = () => {
 
   useEffect(() => {
     const cookieData = Cookies.get("student");
+
     if (cookieData) {
       try {
         const parsed = JSON.parse(cookieData);
-        if (parsed.student) {
-          setStudent(parsed.student);
+        const studentId = parsed.student?.studentId;
+
+        if (studentId) {
+          axios
+            .get(`http://localhost:5000/students/${studentId}`)
+            .then((res) => {
+              setStudent(res.data);
+            })
+            .catch((error) => {
+              console.error("Failed to fetch student data:", error);
+            });
         }
       } catch (e) {
         console.error("Failed to parse student cookie data", e);
       }
     }
   }, []);
+  
 
   const handleStartQuiz = () => {
     if (quizId.trim()) {
@@ -90,12 +102,14 @@ const StudentDashboard: React.FC = () => {
 
   // Create real recent activity from quizAttempted
   const recentActivity =
-    student?.quizAttempted.map((attempt) => ({
-      type: "quiz",
-      title: `Quiz ${attempt.quizId}`,
-      score: `${attempt.score.correct} Correct / ${attempt.score.incorrect} Incorrect`,
-      date: attempt.attemptedAt,
-    })) || [];
+  student?.quizAttempted.map((attempt) => ({
+    quizId: attempt.quizId, // ✅ add this line
+    type: "quiz",
+    title: `Quiz ${attempt.quizId}`,
+    score: `${attempt.score.correct} Correct / ${attempt.score.incorrect} Incorrect`,
+    date: attempt.attemptedAt,
+  })) || [];
+
 
   if (!student) {
     return (
@@ -241,7 +255,7 @@ const StudentDashboard: React.FC = () => {
             {recentActivity.length > 0 ? (
               <div className="space-y-4">
                 {recentActivity.map((activity, index) => (
-                  <Link to={`/singlequiz/${index}`}>
+                  <Link to={`/singlequiz/${activity.quizId}`}>
                     <Card key={index}>
                       <CardHeader className="py-3">
                         <div className="flex justify-between items-center">
