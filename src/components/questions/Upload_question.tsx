@@ -119,20 +119,49 @@ export default function SimpleQuestionForm() {
   };
 
   return (
-    <div className="bg-white shadow rounded-lg p-6 max-w-2xl mx-auto my-4">
-      <h2 className="text-xl font-bold text-gray-800 mb-4">Upload Question</h2>
+    <div
+      style={{
+        backgroundColor: "white",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+        borderRadius: "8px",
+        padding: "24px",
+        maxWidth: "672px",
+        margin: "16px auto",
+      }}
+    >
+      <h2
+        style={{
+          fontSize: "20px",
+          fontWeight: "bold",
+          color: "#1f2937",
+          marginBottom: "16px",
+        }}
+      >
+        Upload Question
+      </h2>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
         {/* Basic Info */}
-        <div className="grid grid-cols-2 gap-4">
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "16px",
+            marginBottom: "16px",
+          }}
+        >
           <input
             type="text"
             name="subject"
             value={form.subject}
             onChange={handleChange}
             placeholder="Subject"
-            className="px-3 py-2 border rounded-md"
             required
+            style={{
+              padding: "8px 12px",
+              border: "1px solid #d1d5db",
+              borderRadius: "6px",
+            }}
           />
           <input
             type="text"
@@ -140,8 +169,12 @@ export default function SimpleQuestionForm() {
             value={form.class}
             onChange={handleChange}
             placeholder="Class/Grade"
-            className="px-3 py-2 border rounded-md"
             required
+            style={{
+              padding: "8px 12px",
+              border: "1px solid #d1d5db",
+              borderRadius: "6px",
+            }}
           />
         </div>
 
@@ -150,28 +183,73 @@ export default function SimpleQuestionForm() {
           value={form.question}
           onChange={handleChange}
           placeholder="Question"
-          className="w-full px-3 py-2 border rounded-md min-h-16"
           required
+          style={{
+            width: "100%",
+            padding: "8px 12px",
+            border: "1px solid #d1d5db",
+            borderRadius: "6px",
+            minHeight: "64px",
+            marginBottom: "16px",
+            boxSizing: "border-box",
+          }}
         />
 
-        <div>
+        {/* Question Image Section */}
+        <div style={{ marginBottom: "16px" }}>
+          <label
+            style={{
+              display: "block",
+              fontSize: "14px",
+              fontWeight: "500",
+              marginBottom: "8px",
+            }}
+          >
+            Question Image
+          </label>
+          <input
+            type="url"
+            name="questionImage"
+            value={form.questionImage}
+            onChange={handleChange}
+            placeholder="Enter image URL or upload file below"
+            style={{
+              width: "100%",
+              padding: "8px 12px",
+              border: "1px solid #d1d5db",
+              borderRadius: "6px",
+              marginBottom: "8px",
+              boxSizing: "border-box",
+            }}
+          />
           <input
             type="file"
             accept="image/*"
             onChange={(e) => handleFileUpload(e, "questionImage")}
-            className="w-full"
+            style={{ width: "100%" }}
           />
           {form.questionImage && (
             <img
               src={form.questionImage}
               alt="Question"
-              className="mt-2 max-h-32 rounded"
+              style={{
+                marginTop: "8px",
+                maxHeight: "128px",
+                borderRadius: "6px",
+              }}
             />
           )}
         </div>
 
         {/* Options */}
-        <div className="grid grid-cols-2 gap-3">
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "12px",
+            marginBottom: "16px",
+          }}
+        >
           {form.options.map((opt, index) => (
             <input
               key={index}
@@ -180,8 +258,12 @@ export default function SimpleQuestionForm() {
               value={opt}
               onChange={handleChange}
               placeholder={`Option ${index + 1}`}
-              className="px-3 py-2 border rounded-md"
               required
+              style={{
+                padding: "8px 12px",
+                border: "1px solid #d1d5db",
+                borderRadius: "6px",
+              }}
             />
           ))}
         </div>
@@ -190,8 +272,14 @@ export default function SimpleQuestionForm() {
           name="correctAnswer"
           value={form.correctAnswer}
           onChange={handleChange}
-          className="w-full px-3 py-2 border rounded-md"
           required
+          style={{
+            width: "100%",
+            padding: "8px 12px",
+            border: "1px solid #d1d5db",
+            borderRadius: "6px",
+            marginBottom: "16px",
+          }}
         >
           <option value="">Select correct option</option>
           {form.options.map((opt, index) => (
@@ -202,42 +290,110 @@ export default function SimpleQuestionForm() {
         </select>
 
         {/* Hints */}
-        <div className="space-y-3 pt-2 border-t">
+        <div style={{ paddingTop: "8px", borderTop: "1px solid #d1d5db" }}>
           <textarea
             name="hintText"
             value={form.hint.text}
             onChange={handleChange}
             placeholder="Hint Text (Optional)"
-            className="w-full px-3 py-2 border rounded-md"
+            style={{
+              width: "100%",
+              padding: "8px 12px",
+              border: "1px solid #d1d5db",
+              borderRadius: "6px",
+              marginBottom: "12px",
+              boxSizing: "border-box",
+            }}
           />
 
-          <div>
+          {/* Hint Image Section */}
+          <div style={{ marginBottom: "12px" }}>
+            <label
+              style={{
+                display: "block",
+                fontSize: "14px",
+                fontWeight: "500",
+                marginBottom: "8px",
+              }}
+            >
+              Hint Image
+            </label>
+            <input
+              type="url"
+              name="hintImage"
+              value={form.hint.image}
+              onChange={handleChange}
+              placeholder="Enter image URL or upload file below"
+              style={{
+                width: "100%",
+                padding: "8px 12px",
+                border: "1px solid #d1d5db",
+                borderRadius: "6px",
+                marginBottom: "8px",
+                boxSizing: "border-box",
+              }}
+            />
             <input
               type="file"
               accept="image/*"
               onChange={(e) => handleFileUpload(e, "image")}
-              placeholder="Hint Image"
-              className="w-full"
+              style={{ width: "100%" }}
             />
             {form.hint.image && (
               <img
                 src={form.hint.image}
                 alt="Hint"
-                className="mt-2 max-h-32 rounded"
+                style={{
+                  marginTop: "8px",
+                  maxHeight: "128px",
+                  borderRadius: "6px",
+                }}
               />
             )}
           </div>
 
-          <div>
+          {/* Hint Video Section */}
+          <div style={{ marginBottom: "16px" }}>
+            <label
+              style={{
+                display: "block",
+                fontSize: "14px",
+                fontWeight: "500",
+                marginBottom: "8px",
+              }}
+            >
+              Hint Video
+            </label>
+            <input
+              type="url"
+              name="hintVideo"
+              value={form.hint.video}
+              onChange={handleChange}
+              placeholder="Enter video URL or upload file below"
+              style={{
+                width: "100%",
+                padding: "8px 12px",
+                border: "1px solid #d1d5db",
+                borderRadius: "6px",
+                marginBottom: "8px",
+                boxSizing: "border-box",
+              }}
+            />
             <input
               type="file"
               accept="video/*"
               onChange={(e) => handleFileUpload(e, "video")}
-              placeholder="Hint Video"
-              className="w-full"
+              style={{ width: "100%" }}
             />
             {form.hint.video && !form.hint.video.includes("youtube.com") && (
-              <video controls className="mt-2 max-h-32 rounded">
+              <video
+                controls
+                style={{
+                  marginTop: "8px",
+                  maxHeight: "128px",
+                  borderRadius: "6px",
+                }}
+              >
                 <source src={form.hint.video} type="video/mp4" />
                 Your browser does not support video.
               </video>
@@ -248,22 +404,28 @@ export default function SimpleQuestionForm() {
                 height="180"
                 src={form.hint.video.replace("watch?v=", "embed/")}
                 title="YouTube preview"
-                className="mt-2 rounded"
+                style={{ marginTop: "8px", borderRadius: "6px" }}
               ></iframe>
             )}
           </div>
         </div>
 
         <button
-          type="submit"
+          onClick={handleSubmit}
           disabled={uploading}
-          className={`px-4 py-2 bg-blue-600 text-white rounded-md w-full ${
-            uploading ? "opacity-70" : "hover:bg-blue-700"
-          }`}
+          style={{
+            padding: "8px 16px",
+            backgroundColor: uploading ? "#93c5fd" : "#2563eb",
+            color: "white",
+            borderRadius: "6px",
+            width: "100%",
+            border: "none",
+            cursor: uploading ? "not-allowed" : "pointer",
+          }}
         >
           {uploading ? "Processing..." : "Submit Question"}
         </button>
-      </form>
+      </div>
     </div>
   );
 }
