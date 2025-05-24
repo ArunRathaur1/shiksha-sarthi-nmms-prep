@@ -4,6 +4,7 @@ export default function SimpleQuestionForm() {
   const initialFormState = {
     subject: "",
     class: "",
+    topic: "",
     question: "",
     options: ["", "", "", ""],
     correctAnswer: "",
@@ -177,6 +178,23 @@ export default function SimpleQuestionForm() {
             }}
           />
         </div>
+
+        <input
+          type="text"
+          name="topic"
+          value={form.topic}
+          onChange={handleChange}
+          placeholder="Topic"
+          required
+          style={{
+            width: "100%",
+            padding: "8px 12px",
+            border: "1px solid #d1d5db",
+            borderRadius: "6px",
+            marginBottom: "16px",
+            boxSizing: "border-box",
+          }}
+        />
 
         <textarea
           name="question"
