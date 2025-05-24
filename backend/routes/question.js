@@ -2,26 +2,20 @@ const express = require("express");
 const router = express.Router();
 const Question = require("../models/Question");
 require("dotenv").config();
+
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
+// Create question with Gemini-generated hint
 router.post("/", async (req, res) => {
   try {
-    let { subject, class: className, question, options, hint } = req.body;
+    let { subject, topic, class: className, question, options, hint } = req.body;
 
-    // If hint text is empty, call Gemini API to generate it
     if (!hint?.text || hint.text.trim() === "") {
-      // Construct prompt for hint generation
-      const prompt = `Provide a helpful hint (max 50 words) for this multiple-choice question:\nQuestion: ${question}\nOptions: ${options.join(
-        ", "
-      )}\nHint:`;
+      const prompt = `Provide a helpful hint (max 50 words) for this multiple-choice question:\nQuestion: ${question}\nOptions: ${options.join(", ")}\nHint:`;
 
       const requestBody = {
-        contents: [
-          {
-            parts: [{ text: prompt }],
-          },
-        ],
+        contents: [{ parts: [{ text: prompt }] }],
       };
 
       const geminiResponse = await fetch(GEMINI_API_URL, {
@@ -32,15 +26,10 @@ router.post("/", async (req, res) => {
 
       const geminiData = await geminiResponse.json();
 
-      // Extract generated hint text
-      const generatedHint =
-        geminiData?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
-
-      // Update hint.text with generated hint
+      const generatedHint = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
       hint = { ...hint, text: generatedHint };
     }
 
-    // Now save question with (possibly updated) hint
     const questionToSave = new Question({ ...req.body, hint });
     await questionToSave.save();
 
@@ -51,23 +40,15 @@ router.post("/", async (req, res) => {
   }
 });
 
-
+// Create question from teacher
 router.post("/teacher", async (req, res) => {
   try {
     const { teacherId, questionData } = req.body;
-
     if (!teacherId || !questionData) {
-      return res
-        .status(400)
-        .json({ error: "Missing teacherId or questionData" });
+      return res.status(400).json({ error: "Missing teacherId or questionData" });
     }
 
-    // Create new question with teacherId
-    const newQuestion = new Question({
-      ...questionData,
-      teacherId: teacherId, // your custom teacherId string
-    });
-
+    const newQuestion = new Question({ ...questionData, teacherId });
     await newQuestion.save();
 
     res.status(201).json(newQuestion);
@@ -77,7 +58,7 @@ router.post("/teacher", async (req, res) => {
   }
 });
 
-
+// Get all questions
 router.get("/", async (req, res) => {
   try {
     const questions = await Question.find();
@@ -87,37 +68,65 @@ router.get("/", async (req, res) => {
   }
 });
 
+// Get single question
 router.get("/:id", async (req, res) => {
   try {
     const question = await Question.findById(req.params.id);
-    if (!question)
-      return res.status(404).json({ message: "Question not found" });
+    if (!question) return res.status(404).json({ message: "Question not found" });
     res.status(200).json(question);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
+// Update question
 router.put("/:id", async (req, res) => {
   try {
     const updated = await Question.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
     });
-    if (!updated)
-      return res.status(404).json({ message: "Question not found" });
+    if (!updated) return res.status(404).json({ message: "Question not found" });
     res.status(200).json(updated);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 });
 
+// Delete question
 router.delete("/:id", async (req, res) => {
   try {
     const deleted = await Question.findByIdAndDelete(req.params.id);
-    if (!deleted)
-      return res.status(404).json({ message: "Question not found" });
+    if (!deleted) return res.status(404).json({ message: "Question not found" });
     res.status(200).json({ message: "Question deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+router.get("/topics/:class/:subject", async (req, res) => {
+  try {
+    const { class: className, subject } = req.params;
+    const topics = await Question.distinct("topic", {
+      class: className,
+      subject: subject,
+    });
+    res.status(200).json({ class: className, subject, topics });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get("/:class/:subject/:topic", async (req, res) => {
+  try {
+    const { class: className, subject, topic } = req.params;
+    const questions = await Question.find({
+      class: className,
+      subject,
+      topic,
+    });
+    res.status(200).json(questions);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
