@@ -38,10 +38,10 @@ const StudentDashboard: React.FC = () => {
 
   useEffect(() => {
     const cookieData = Cookies.get("student");
-    // const parsedData = JSON.parse(cookieData);
-    // const studentClass = parsedData.student?.class;
-    // console.log("Student Class:", studentClass);
-    // console.log(cookieData);
+    const parsedData = JSON.parse(cookieData);
+    const studentClass = parsedData.student?.class;
+    console.log("Student Class:", studentClass);
+    console.log(cookieData);
     if (cookieData) {
       try {
         const parsed = JSON.parse(cookieData);
