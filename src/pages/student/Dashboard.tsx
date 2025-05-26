@@ -22,6 +22,7 @@ const StudentDashboard: React.FC = () => {
   const [student, setStudent] = useState<null | {
     _id: string;
     studentId: string;
+    class:string;
     name: string;
     quizAttempted: {
       quizId: string;
@@ -133,6 +134,7 @@ const StudentDashboard: React.FC = () => {
               Welcome back, {student.name}!
             </h1>
             <p className="text-gray-600">Student ID: {student.studentId}</p>
+            <p className="text-gray-600">Student Class: {student.class}</p>
           </div>
 
           {/* Actions */}
