@@ -28,6 +28,7 @@ const PracticeQuiz: React.FC = () => {
   >([]);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [endTime, setEndTime] = useState<number | null>(null);
+  const [questionStartTime, setQuestionStartTime] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [showFeedback, setShowFeedback] = useState(false);
   const [showHint, setShowHint] = useState(false);
@@ -43,6 +44,7 @@ const PracticeQuiz: React.FC = () => {
         const res = await axios.get(`http://localhost:5000/questions/${className}/${subject}/${topic}`);
         setQuestions(res.data);
         setStartTime(Date.now());
+        setQuestionStartTime(Date.now());
       } catch (err) {
         console.error(err);
       } finally {
@@ -77,6 +79,7 @@ const PracticeQuiz: React.FC = () => {
     // Check if this is the last question
     if (current < questions.length - 1) {
       setCurrent(current + 1);
+      setQuestionStartTime(Date.now()); // Reset question timer
     } else {
       // Quiz is completed
       setEndTime(Date.now());
@@ -92,6 +95,7 @@ const PracticeQuiz: React.FC = () => {
     // Check if this is the last question
     if (current < questions.length - 1) {
       setCurrent(current + 1);
+      setQuestionStartTime(Date.now()); // Reset question timer
     } else {
       // Quiz is completed
       setEndTime(Date.now());
@@ -103,8 +107,15 @@ const PracticeQuiz: React.FC = () => {
     const correct = answers.filter((a) => a.isCorrect).length;
     const incorrect = answers.filter((a) => !a.isCorrect).length;
     const unattempted = questions.length - answers.length;
+    
+    // Calculate total time properly
     const totalTime = endTime && startTime ? (endTime - startTime) / 1000 : 0;
-    const avgTime = answers.length > 0 ? totalTime / answers.length : 0;
+    
+    // Calculate average time per question based on total questions attempted/viewed
+    // This includes both answered and skipped questions
+    const questionsAttempted = quizCompleted ? questions.length : current + 1;
+    const avgTime = questionsAttempted > 0 ? totalTime / questionsAttempted : 0;
+    
     const score = questions.length > 0 ? Math.round((correct / questions.length) * 100) : 0;
 
     return { correct, incorrect, unattempted, totalTime, avgTime, score };
@@ -179,7 +190,7 @@ const PracticeQuiz: React.FC = () => {
     );
   };
 
-  // Helper function to render question image
+  // Helper function to render question image with fixed size
   const renderQuestionImage = (questionImage?: string) => {
     if (!questionImage || !questionImage.trim()) return null;
 
@@ -189,16 +200,20 @@ const PracticeQuiz: React.FC = () => {
           <Image className="text-blue-600" size={18} />
           <span className="text-sm font-medium text-gray-700">Question Image:</span>
         </div>
-        <div className="border-2 border-gray-200 rounded-lg p-2 bg-gray-50">
-          <img 
-            src={questionImage} 
-            alt="Question" 
-            className="max-w-full h-auto rounded-lg shadow-sm"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-              e.currentTarget.parentElement!.style.display = 'none';
-            }}
-          />
+        <div className="border-2 border-gray-200 rounded-lg p-3 bg-gray-50">
+          <div className="flex justify-center">
+            <img 
+              src={questionImage} 
+              alt="Question" 
+              className="max-w-full max-h-80 w-auto h-auto object-contain rounded-lg shadow-sm"
+              style={{ maxWidth: '500px', maxHeight: '320px' }}
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                const parent = e.currentTarget.parentElement?.parentElement;
+                if (parent) parent.style.display = 'none';
+              }}
+            />
+          </div>
         </div>
       </div>
     );
@@ -305,7 +320,7 @@ const PracticeQuiz: React.FC = () => {
                 {String(questions[current].question)}
               </h2>
 
-              {/* Question Image */}
+              {/* Question Image with Fixed Size */}
               {renderQuestionImage(questions[current].questionImage)}
               
               <div className="grid gap-3">
@@ -510,6 +525,7 @@ const PracticeQuiz: React.FC = () => {
                   setShowHint(false);
                   setAttemptedQuestions(new Set());
                   setStartTime(Date.now());
+                  setQuestionStartTime(Date.now());
                   setEndTime(null);
                 }}
                 className="bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 px-8 rounded-lg font-medium hover:from-green-700 hover:to-emerald-700 transition-all duration-200 shadow-lg"
