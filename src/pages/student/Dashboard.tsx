@@ -66,12 +66,25 @@ const StudentDashboard: React.FC = () => {
   
 
   const handleStartQuiz = () => {
-    if (quizId.trim()) {
-      navigate(`/attemptquiz/${quizId.trim()}`);
-    } else {
+    const trimmedQuizId = quizId.trim();
+
+    if (!trimmedQuizId) {
       alert("Please enter a Quiz ID");
+      return;
     }
+
+    const alreadyAttempted = student?.quizAttempted.some(
+      (attempt) => attempt.quizId === trimmedQuizId
+    );
+
+    if (alreadyAttempted) {
+      alert(`You have already attempted Quiz ID: ${trimmedQuizId}`);
+      return;
+    }
+
+    navigate(`/attemptquiz/${trimmedQuizId}`);
   };
+  
 
   const subjectProgress = [
     {
