@@ -12,7 +12,7 @@ router.post("/", async (req, res) => {
     let { subject, topic, class: className, question, options, hint } = req.body;
 
     if (!hint?.text || hint.text.trim() === "") {
-      const prompt = `Provide a helpful hint (max 50 words) for this multiple-choice question:\nQuestion: ${question}\nOptions: ${options.join(", ")}\nHint:`;
+      const prompt = `Provide a helpful hint (max 50 words) for this multiple-choice question in hindi:\nQuestion: ${question}\nOptions: ${options.join(", ")}\nHint:`;
 
       const requestBody = {
         contents: [{ parts: [{ text: prompt }] }],
