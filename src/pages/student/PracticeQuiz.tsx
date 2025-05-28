@@ -1,278 +1,544 @@
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import Cookies from 'js-cookie';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { Clock, CheckCircle, XCircle, AlertCircle, Trophy, Target, Timer, BarChart3, Lightbulb, SkipForward, Image, Video, ExternalLink } from 'lucide-react';
 
-import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
-import { Progress } from '@/components/ui/progress';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import { ArrowLeft, ArrowRight, Check, AlertTriangle } from 'lucide-react';
-import { useQuiz, Question } from '@/contexts/QuizContext';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/components/ui/use-toast';
+interface Question {
+  _id: string;
+  question: string;
+  questionImage?: string; // Added question image support
+  options: string[];
+  correctAnswer: string;
+  hint?: {
+    text?: string;
+    image?: string;
+    video?: string;
+  };
+}
 
 const PracticeQuiz: React.FC = () => {
-  const { subject } = useParams<{ subject: string }>();
-  const { practiceQuestions } = useQuiz();
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedAnswers, setSelectedAnswers] = useState<number[]>([]);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [score, setScore] = useState(0);
+  const { subject, topic } = useParams<{ subject: string; topic: string }>();
   const [questions, setQuestions] = useState<Question[]>([]);
-  
+  const [current, setCurrent] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [answers, setAnswers] = useState<
+    { questionId: string; selected: string; isCorrect: boolean }[]
+  >([]);
+  const [startTime, setStartTime] = useState<number | null>(null);
+  const [endTime, setEndTime] = useState<number | null>(null);
+  const [questionStartTime, setQuestionStartTime] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [showHint, setShowHint] = useState(false);
+  const [attemptedQuestions, setAttemptedQuestions] = useState<Set<number>>(new Set());
+  const [quizCompleted, setQuizCompleted] = useState(false); // Added explicit quiz completion state
+
   useEffect(() => {
-    if (subject && practiceQuestions[subject]) {
-      setQuestions(practiceQuestions[subject]);
-      setSelectedAnswers(new Array(practiceQuestions[subject].length).fill(-1));
-    } else {
-      navigate('/student/practice');
-    }
-  }, [subject, practiceQuestions, navigate]);
-  
-  const handleAnswerSelect = (value: string) => {
-    const newSelectedAnswers = [...selectedAnswers];
-    newSelectedAnswers[currentQuestionIndex] = parseInt(value);
-    setSelectedAnswers(newSelectedAnswers);
-  };
-  
-  const handleNext = () => {
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-    }
-  };
-  
-  const handlePrevious = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
-    }
-  };
-  
-  const handleSubmit = () => {
-    // Check if all questions are answered
-    const unansweredQuestions = selectedAnswers.filter(answer => answer === -1).length;
-    
-    if (unansweredQuestions > 0) {
-      toast({
-        title: "Warning",
-        description: `You have ${unansweredQuestions} unanswered questions. Are you sure you want to submit?`,
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    // Calculate score
-    let newScore = 0;
-    for (let i = 0; i < questions.length; i++) {
-      if (selectedAnswers[i] === questions[i].correctAnswer) {
-        newScore++;
+    const fetchQuestions = async () => {
+      try {
+        const studentCookie = Cookies.get("student");
+        const parsed = studentCookie ? JSON.parse(studentCookie) : null;
+        const className = parsed?.student?.class || parsed?.class || null;
+        const res = await axios.get(`http://localhost:5000/questions/${className}/${subject}/${topic}`);
+        setQuestions(res.data);
+        setStartTime(Date.now());
+        setQuestionStartTime(Date.now());
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
       }
+    };
+    fetchQuestions();
+  }, [subject, topic]);
+
+  const handleAnswer = (option: string) => {
+    if (selectedAnswer !== null) return;
+
+    const currentQuestion = questions[current];
+    const isCorrect = option === currentQuestion.correctAnswer;
+
+    setSelectedAnswer(option);
+    setAnswers((prev) => [
+      ...prev,
+      { questionId: currentQuestion._id, selected: option, isCorrect },
+    ]);
+    setAttemptedQuestions(prev => new Set(prev).add(current));
+    
+    setShowFeedback(true);
+  };
+
+  const handleNext = () => {
+    // Reset states for next question
+    setSelectedAnswer(null);
+    setShowFeedback(false);
+    setShowHint(false);
+    
+    // Check if this is the last question
+    if (current < questions.length - 1) {
+      setCurrent(current + 1);
+      setQuestionStartTime(Date.now()); // Reset question timer
+    } else {
+      // Quiz is completed
+      setEndTime(Date.now());
+      setQuizCompleted(true);
     }
-    
-    setScore(newScore);
-    setIsSubmitted(true);
-    
-    toast({
-      title: "Quiz Submitted",
-      description: `You scored ${newScore} out of ${questions.length} questions!`,
-    });
   };
-  
-  const subjectDisplayNames: Record<string, string> = {
-    'mathematics': 'Mathematics',
-    'science': 'Science',
-    'social': 'Social Science',
-    'mat': 'Mental Ability Test',
+
+  const handleSkip = () => {
+    setSelectedAnswer(null);
+    setShowFeedback(false);
+    setShowHint(false);
+    
+    // Check if this is the last question
+    if (current < questions.length - 1) {
+      setCurrent(current + 1);
+      setQuestionStartTime(Date.now()); // Reset question timer
+    } else {
+      // Quiz is completed
+      setEndTime(Date.now());
+      setQuizCompleted(true);
+    }
   };
-  
-  if (questions.length === 0) {
+
+  const getResult = () => {
+    const correct = answers.filter((a) => a.isCorrect).length;
+    const incorrect = answers.filter((a) => !a.isCorrect).length;
+    const unattempted = questions.length - answers.length;
+    
+    // Calculate total time properly
+    const totalTime = endTime && startTime ? (endTime - startTime) / 1000 : 0;
+    
+    // Calculate average time per question based on total questions attempted/viewed
+    // This includes both answered and skipped questions
+    const questionsAttempted = quizCompleted ? questions.length : current + 1;
+    const avgTime = questionsAttempted > 0 ? totalTime / questionsAttempted : 0;
+    
+    const score = questions.length > 0 ? Math.round((correct / questions.length) * 100) : 0;
+
+    return { correct, incorrect, unattempted, totalTime, avgTime, score };
+  };
+
+  // Helper function to check if hint exists and has content
+  const hasHint = (question: Question) => {
+    if (!question.hint) return false;
+    return !!(question.hint.text?.trim() || question.hint.image?.trim() || question.hint.video?.trim());
+  };
+
+  // Helper function to render hint content
+  const renderHintContent = (hint: Question['hint']) => {
+    if (!hint) return null;
+
     return (
-      <div className="flex flex-col min-h-screen">
-        <Header />
-        <main className="flex-1 py-8 bg-gray-50">
-          <div className="edu-container">
-            <Card>
-              <CardContent className="py-12 text-center">
-                <p>Loading questions...</p>
-              </CardContent>
-            </Card>
+      <div className="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-lg">
+        <div className="flex items-start gap-2">
+          <Lightbulb className="text-amber-600 mt-0.5 flex-shrink-0" size={18} />
+          <div className="flex-1">
+            <p className="font-medium text-amber-800 mb-2">Hint:</p>
+            
+            {/* Text Hint */}
+            {hint.text && hint.text.trim() && (
+              <div className="mb-3">
+                <p className="text-amber-700">{hint.text}</p>
+              </div>
+            )}
+            
+            {/* Image Hint - As Clickable Link */}
+            {hint.image && hint.image.trim() && (
+              <div className="mb-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <Image className="text-amber-600" size={16} />
+                  <span className="text-sm font-medium text-amber-800">Image Hint:</span>
+                </div>
+                <a 
+                  href={hint.image} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-3 py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-lg transition-colors duration-200 border border-amber-300 hover:border-amber-400"
+                >
+                  <Image size={16} />
+                  <span className="font-medium">View Image Hint</span>
+                  <ExternalLink size={14} />
+                </a>
+              </div>
+            )}
+            
+            {/* Video Hint - As Clickable Link */}
+            {hint.video && hint.video.trim() && (
+              <div className="mb-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <Video className="text-amber-600" size={16} />
+                  <span className="text-sm font-medium text-amber-800">Video Hint:</span>
+                </div>
+                <a 
+                  href={hint.video} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-3 py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-lg transition-colors duration-200 border border-amber-300 hover:border-amber-400"
+                >
+                  <Video size={16} />
+                  <span className="font-medium">Watch Video Hint</span>
+                  <ExternalLink size={14} />
+                </a>
+              </div>
+            )}
           </div>
-        </main>
-        <Footer />
+        </div>
       </div>
     );
-  }
-  
-  return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
-      
-      <main className="flex-1 py-8 bg-gray-50">
-        <div className="edu-container">
-          <div className="mb-8">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <Link to="/student/practice">
-                  <Button variant="ghost" size="sm" className="mr-4">
-                    <ArrowLeft className="h-4 w-4 mr-1" />
-                    Back to Subjects
-                  </Button>
-                </Link>
-                <h1 className="text-2xl font-bold">
-                  {subjectDisplayNames[subject || ''] || 'Practice'} Quiz
-                </h1>
-              </div>
-              
-              {!isSubmitted && (
-                <Button onClick={handleSubmit}>Submit Quiz</Button>
-              )}
-            </div>
+  };
+
+  // Helper function to render question image with fixed size
+  const renderQuestionImage = (questionImage?: string) => {
+    if (!questionImage || !questionImage.trim()) return null;
+
+    return (
+      <div className="mb-6">
+        <div className="flex items-center gap-2 mb-3">
+          <Image className="text-blue-600" size={18} />
+          <span className="text-sm font-medium text-gray-700">Question Image:</span>
+        </div>
+        <div className="border-2 border-gray-200 rounded-lg p-3 bg-gray-50">
+          <div className="flex justify-center">
+            <img 
+              src={questionImage} 
+              alt="Question" 
+              className="max-w-full max-h-80 w-auto h-auto object-contain rounded-lg shadow-sm"
+              style={{ maxWidth: '500px', maxHeight: '320px' }}
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                const parent = e.currentTarget.parentElement?.parentElement;
+                if (parent) parent.style.display = 'none';
+              }}
+            />
           </div>
-          
-          {!isSubmitted ? (
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle className="flex justify-between items-center">
-                  <span>Question {currentQuestionIndex + 1} of {questions.length}</span>
-                  <span className="text-sm font-normal text-gray-500">
-                    {selectedAnswers[currentQuestionIndex] >= 0 ? "Answered" : "Unanswered"}
-                  </span>
-                </CardTitle>
-                <Progress value={(currentQuestionIndex + 1) / questions.length * 100} className="mt-2" />
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-8">
-                  <div>
-                    <h3 className="text-lg font-medium mb-4">
-                      {questions[currentQuestionIndex].text}
-                    </h3>
-                    
-                    <RadioGroup 
-                      value={selectedAnswers[currentQuestionIndex].toString()} 
-                      onValueChange={handleAnswerSelect}
-                      className="space-y-3"
+        </div>
+      </div>
+    );
+  };
+
+  if (loading) return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p className="text-lg font-medium text-gray-600">Loading questions...</p>
+      </div>
+    </div>
+  );
+  
+  if (questions.length === 0) return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+      <div className="text-center">
+        <AlertCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+        <p className="text-lg font-medium text-gray-600">No questions available for this topic.</p>
+      </div>
+    </div>
+  );
+
+  const progress = ((current + 1) / questions.length) * 100;
+
+  // Pie chart data
+  const { correct, incorrect, unattempted } = getResult();
+  const pieData = [
+    { name: 'Correct', value: correct, color: '#10B981' },
+    { name: 'Incorrect', value: incorrect, color: '#EF4444' },
+    { name: 'Unattempted', value: unattempted, color: '#6B7280' }
+  ].filter(item => item.value > 0);
+
+  const getScoreMessage = (score: number) => {
+    if (score >= 90) return { message: "Outstanding! 🌟", color: "text-emerald-600" };
+    if (score >= 80) return { message: "Excellent work! 🎉", color: "text-green-600" };
+    if (score >= 70) return { message: "Good job! 👍", color: "text-blue-600" };
+    if (score >= 60) return { message: "Keep practicing! 💪", color: "text-yellow-600" };
+    return { message: "Need more practice 📚", color: "text-red-600" };
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-4xl mx-auto px-4 py-4">
+          <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+            <Target className="text-blue-600" />
+            Practice Quiz: {subject} - {topic}
+          </h1>
+        </div>
+      </div>
+
+      <main className="max-w-4xl mx-auto px-4 py-8">
+        {!quizCompleted ? (
+          <div className="space-y-6">
+            {/* Progress Bar */}
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <div className="flex justify-between items-center mb-4">
+                <span className="text-sm font-medium text-gray-600">
+                  Question {current + 1} of {questions.length}
+                </span>
+                <span className="text-sm font-medium text-gray-600 flex items-center gap-1">
+                  <Clock size={16} />
+                  {startTime ? Math.floor((Date.now() - startTime) / 1000) : 0}s
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3">
+                <div 
+                  className="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all duration-500 ease-out"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+            </div>
+
+            {/* Question Card */}
+            <div className="bg-white rounded-xl shadow-lg p-8 transform transition-all duration-300 hover:shadow-xl">
+              {/* Hint Section */}
+              {hasHint(questions[current]) && (
+                <div className="mb-6">
+                  {!showHint ? (
+                    <button
+                      onClick={() => setShowHint(true)}
+                      className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200 hover:bg-blue-50 px-3 py-2 rounded-lg"
                     >
-                      {questions[currentQuestionIndex].options.map((option, idx) => (
-                        <div key={idx} className="flex items-center space-x-2 border rounded-md p-4 hover:bg-gray-50">
-                          <RadioGroupItem value={idx.toString()} id={`option-${idx}`} />
-                          <Label htmlFor={`option-${idx}`} className="flex-1 cursor-pointer">
-                            {option}
-                          </Label>
-                        </div>
-                      ))}
-                    </RadioGroup>
-                  </div>
+                      <Lightbulb size={18} />
+                      Show Hint
+                    </button>
+                  ) : (
+                    <div>
+                      {renderHintContent(questions[current].hint)}
+                      <button
+                        onClick={() => setShowHint(false)}
+                        className="mt-2 text-sm text-amber-600 hover:text-amber-700 font-medium"
+                      >
+                        Hide Hint
+                      </button>
+                    </div>
+                  )}
                 </div>
-              </CardContent>
-              <CardFooter className="flex justify-between">
-                <Button 
-                  onClick={handlePrevious} 
-                  disabled={currentQuestionIndex === 0}
-                  variant="outline"
-                >
-                  Previous
-                </Button>
-                
-                {currentQuestionIndex < questions.length - 1 ? (
-                  <Button 
-                    onClick={handleNext} 
-                    disabled={currentQuestionIndex === questions.length - 1}
-                  >
-                    Next
-                  </Button>
-                ) : (
-                  <Button onClick={handleSubmit}>
-                    Finish Quiz
-                  </Button>
-                )}
-              </CardFooter>
-            </Card>
-            ) : (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-2xl">Quiz Results</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center mb-8">
-                  <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-primary/10 mb-4">
-                    <span className="text-3xl font-bold">
-                      {score}/{questions.length}
-                    </span>
-                  </div>
-                  <h3 className="text-xl font-bold mb-1">
-                    {score === questions.length 
-                      ? "Perfect Score!" 
-                      : score >= questions.length / 2 
-                        ? "Good job!" 
-                        : "Keep practicing!"}
-                  </h3>
-                  <p className="text-gray-600">
-                    You answered {score} out of {questions.length} questions correctly.
-                  </p>
-                </div>
-                
-                <div className="space-y-6">
-                  <h3 className="font-medium text-lg border-b pb-2">Question Review:</h3>
+              )}
+
+              <h2 className="text-xl font-semibold text-gray-800 mb-6 leading-relaxed">
+                {String(questions[current].question)}
+              </h2>
+
+              {/* Question Image with Fixed Size */}
+              {renderQuestionImage(questions[current].questionImage)}
+              
+              <div className="grid gap-3">
+                {questions[current].options.map((opt, i) => {
+                  const isSelected = opt === selectedAnswer;
+                  const isCorrect = opt === questions[current].correctAnswer;
                   
-                  {questions.map((question, idx) => (
-                    <div key={idx} className="border rounded-md p-4">
-                      <div className="flex items-center mb-2">
-                        <span className="font-medium mr-2">Question {idx + 1}:</span>
-                        {selectedAnswers[idx] === question.correctAnswer ? (
-                          <span className="inline-flex items-center text-green-600">
-                            <Check className="h-4 w-4 mr-1" /> Correct
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center text-red-600">
-                            <AlertTriangle className="h-4 w-4 mr-1" /> Incorrect
-                          </span>
+                  let classes = "p-4 rounded-lg cursor-pointer border-2 transition-all duration-200 text-left";
+                  
+                  if (selectedAnswer === null) {
+                    classes += " border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:shadow-md";
+                  } else {
+                    if (isSelected && isCorrect) {
+                      classes += " border-green-500 bg-green-50 text-green-700";
+                    } else if (isSelected && !isCorrect) {
+                      classes += " border-red-500 bg-red-50 text-red-700";
+                    } else if (isCorrect) {
+                      classes += " border-green-500 bg-green-50 text-green-700";
+                    } else {
+                      classes += " border-gray-200 bg-gray-50 text-gray-500";
+                    }
+                  }
+
+                  return (
+                    <div
+                      key={i}
+                      className={classes}
+                      onClick={() => handleAnswer(opt)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">{String(opt)}</span>
+                        {selectedAnswer !== null && (
+                          <>
+                            {isSelected && isCorrect && <CheckCircle className="text-green-600" size={20} />}
+                            {isSelected && !isCorrect && <XCircle className="text-red-600" size={20} />}
+                            {!isSelected && isCorrect && <CheckCircle className="text-green-600" size={20} />}
+                          </>
                         )}
                       </div>
-                      <p className="mb-4">{question.text}</p>
-                      
-                      <div className="space-y-2 mb-4">
-                        {question.options.map((option, optIdx) => (
-                          <div 
-                            key={optIdx}
-                            className={`p-2 rounded-md ${
-                              question.correctAnswer === optIdx
-                                ? 'bg-green-100 border border-green-300'
-                                : selectedAnswers[idx] === optIdx
-                                  ? 'bg-red-100 border border-red-300'
-                                  : 'bg-gray-50 border border-gray-200'
-                            }`}
-                          >
-                            {option}
-                            {question.correctAnswer === optIdx && (
-                              <span className="ml-2 text-sm text-green-600">
-                                (Correct answer)
-                              </span>
-                            )}
-                          </div>
-                        ))}
-                      </div>
                     </div>
-                  ))}
+                  );
+                })}
+              </div>
+
+              {showFeedback && (
+                <div className="mt-6 p-4 rounded-lg bg-gray-50 border-l-4 border-blue-500">
+                  <div className="flex items-center gap-2 mb-2">
+                    {selectedAnswer === questions[current].correctAnswer ? (
+                      <CheckCircle className="text-green-600" size={20} />
+                    ) : (
+                      <XCircle className="text-red-600" size={20} />
+                    )}
+                    <span className="font-medium">
+                      {selectedAnswer === questions[current].correctAnswer ? "Correct!" : "Incorrect"}
+                    </span>
+                  </div>
+                  {selectedAnswer !== questions[current].correctAnswer && (
+                    <p className="text-sm text-gray-600">
+                      The correct answer is: <strong>{String(questions[current].correctAnswer)}</strong>
+                    </p>
+                  )}
                 </div>
-              </CardContent>
-              <CardFooter className="flex justify-center">
-                <Link to="/student/practice">
-                  <Button>
-                    Try Another Subject
-                  </Button>
-                </Link>
-              </CardFooter>
-            </Card>
-          )}
-        </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="mt-6 flex gap-3">
+                {selectedAnswer ? (
+                  <button
+                    onClick={handleNext}
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg"
+                  >
+                    {current === questions.length - 1 ? "Finish Quiz 🎯" : "Next Question →"}
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleSkip}
+                    className="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 text-white py-3 px-6 rounded-lg font-medium hover:from-gray-600 hover:to-gray-700 transition-all duration-200 shadow-lg flex items-center justify-center gap-2"
+                  >
+                    <SkipForward size={18} />
+                    {current === questions.length - 1 ? "Finish Quiz" : "Skip Question"}
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* Results Page */
+          <div className="space-y-6">
+            {/* Score Card */}
+            <div className="bg-white rounded-xl shadow-lg p-8 text-center">
+              <div className="mb-6">
+                <Trophy className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
+                <h2 className="text-3xl font-bold text-gray-800 mb-2">Quiz Complete!</h2>
+                <div className={`text-xl font-semibold ${getScoreMessage(getResult().score).color}`}>
+                  {getScoreMessage(getResult().score).message}
+                </div>
+              </div>
+              
+              <div className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-2">
+                {getResult().score}%
+              </div>
+              <p className="text-gray-600">Your Score</p>
+            </div>
+
+            {/* Analytics */}
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Pie Chart */}
+              <div className="bg-white rounded-xl shadow-lg p-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                  <BarChart3 className="text-blue-600" />
+                  Performance Breakdown
+                </h3>
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={pieData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={100}
+                        paddingAngle={5}
+                        dataKey="value"
+                      >
+                        {pieData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* Detailed Stats */}
+              <div className="bg-white rounded-xl shadow-lg p-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                  <Timer className="text-blue-600" />
+                  Detailed Statistics
+                </h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="text-green-600" size={20} />
+                      <span className="font-medium text-green-700">Correct Answers</span>
+                    </div>
+                    <span className="text-xl font-bold text-green-600">{correct}</span>
+                  </div>
+                  
+                  <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <XCircle className="text-red-600" size={20} />
+                      <span className="font-medium text-red-700">Incorrect Answers</span>
+                    </div>
+                    <span className="text-xl font-bold text-red-600">{incorrect}</span>
+                  </div>
+
+                  {unattempted > 0 && (
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <AlertCircle className="text-gray-600" size={20} />
+                        <span className="font-medium text-gray-700">Unattempted</span>
+                      </div>
+                      <span className="text-xl font-bold text-gray-600">{unattempted}</span>
+                    </div>
+                  )}
+                  
+                  <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <Clock className="text-blue-600" size={20} />
+                      <span className="font-medium text-blue-700">Total Time</span>
+                    </div>
+                    <span className="text-xl font-bold text-blue-600">
+                      {Math.floor(getResult().totalTime)}s
+                    </span>
+                  </div>
+                  
+                  <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <Timer className="text-purple-600" size={20} />
+                      <span className="font-medium text-purple-700">Avg Time/Question</span>
+                    </div>
+                    <span className="text-xl font-bold text-purple-600">
+                      {getResult().avgTime.toFixed(1)}s
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-4 justify-center">
+              <button 
+                onClick={() => {
+                  // Reset quiz state
+                  setCurrent(0);
+                  setQuizCompleted(false);
+                  setAnswers([]);
+                  setSelectedAnswer(null);
+                  setShowFeedback(false);
+                  setShowHint(false);
+                  setAttemptedQuestions(new Set());
+                  setStartTime(Date.now());
+                  setQuestionStartTime(Date.now());
+                  setEndTime(null);
+                }}
+                className="bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 px-8 rounded-lg font-medium hover:from-green-700 hover:to-emerald-700 transition-all duration-200 shadow-lg"
+              >
+                Retake Quiz
+              </button>
+              <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-8 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg">
+                Review Answers
+              </button>
+            </div>
+          </div>
+        )}
       </main>
-      
-      <Footer />
     </div>
   );
 };

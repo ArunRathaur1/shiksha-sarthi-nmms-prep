@@ -22,6 +22,7 @@ const StudentDashboard: React.FC = () => {
   const [student, setStudent] = useState<null | {
     _id: string;
     studentId: string;
+    class:string;
     name: string;
     quizAttempted: {
       quizId: string;
@@ -38,7 +39,10 @@ const StudentDashboard: React.FC = () => {
 
   useEffect(() => {
     const cookieData = Cookies.get("student");
-
+    const parsedData = JSON.parse(cookieData);
+    const studentClass = parsedData.student?.class;
+    console.log("Student Class:", studentClass);
+    console.log(cookieData);
     if (cookieData) {
       try {
         const parsed = JSON.parse(cookieData);
@@ -62,12 +66,25 @@ const StudentDashboard: React.FC = () => {
   
 
   const handleStartQuiz = () => {
-    if (quizId.trim()) {
-      navigate(`/attemptquiz/${quizId.trim()}`);
-    } else {
+    const trimmedQuizId = quizId.trim();
+
+    if (!trimmedQuizId) {
       alert("Please enter a Quiz ID");
+      return;
     }
+
+    const alreadyAttempted = student?.quizAttempted.some(
+      (attempt) => attempt.quizId === trimmedQuizId
+    );
+
+    if (alreadyAttempted) {
+      alert(`You have already attempted Quiz ID: ${trimmedQuizId}`);
+      return;
+    }
+
+    navigate(`/attemptquiz/${trimmedQuizId}`);
   };
+  
 
   const subjectProgress = [
     {
@@ -130,6 +147,7 @@ const StudentDashboard: React.FC = () => {
               Welcome back, {student.name}!
             </h1>
             <p className="text-gray-600">Student ID: {student.studentId}</p>
+            <p className="text-gray-600">Student Class: {student.class}</p>
           </div>
 
           {/* Actions */}
