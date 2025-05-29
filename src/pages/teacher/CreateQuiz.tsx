@@ -70,37 +70,47 @@ export default function CreateQuiz() {
   };
 
   const handleSubmit = async () => {
-    if (!teacherId || selectedQuestions.length === 0 || !quizId.trim()) {
-      toast({
-        title: "Error",
-        description:
-          "Please select questions, enter Quiz ID, and ensure you're logged in as a teacher",
-        variant: "destructive",
-      });
-      return;
-    }
+  if (!teacherId || selectedQuestions.length === 0 || !quizId.trim()) {
+    toast({
+      title: "Error",
+      description:
+        "Please select questions, enter Quiz ID, and ensure you're logged in as a teacher",
+      variant: "destructive",
+    });
+    return;
+  }
 
-    try {
-      await axios.post("http://localhost:5000/quizzes/", {
-        teacherId,
-        quizId: quizId.trim(), // <-- send quizId here
-        questions: selectedQuestions,
-      });
+  try {
+    const payload = {
+      teacherId,
+      quizId: quizId.trim(),
+      questions: selectedQuestions,
+    };
 
-      toast({
-        title: "Quiz Created",
-        description: "Your quiz was successfully created!",
-      });
-      setSelectedQuestions([]);
-      setQuizId(""); // reset quizId if needed
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.response?.data?.error || "Failed to create quiz",
-        variant: "destructive",
-      });
-    }
-  };
+    console.log("Submitting quiz with payload:", payload); // ✅ Debug log
+
+    const res = await axios.post("http://localhost:5000/quizzes/", payload);
+
+    console.log("Quiz creation success:", res.data); // ✅ Debug log
+
+    toast({
+      title: "Quiz Created",
+      description: `Your quiz "${res.data.quizId}" was successfully created!`,
+    });
+
+    setSelectedQuestions([]);
+    setQuizId("");
+  } catch (error: any) {
+    console.error("Quiz creation failed:", error); // ✅ Debug log
+
+    toast({
+      title: "Error",
+      description: error.response?.data?.error || "Failed to create quiz",
+      variant: "destructive",
+    });
+  }
+};
+
 
   return (
     <div className="p-4">
