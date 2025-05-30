@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom"; // ✅ include useNavigate
 import axios from "axios";
-import { Link } from "react-router-dom";
 import Cookies from "js-cookie";
 import Header from "@/components/Header";
 
@@ -26,6 +25,7 @@ interface Student {
 
 const AttemptQuiz: React.FC = () => {
   const { id } = useParams();
+  const navigate = useNavigate(); // ✅ create navigate instance
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [answers, setAnswers] = useState<{ [key: string]: string }>({});
   const [student, setStudent] = useState<Student | null>(null);
@@ -79,6 +79,7 @@ const AttemptQuiz: React.FC = () => {
       );
       Cookies.set("quizResult", JSON.stringify(response.data), { expires: 7 });
       alert("Quiz submitted successfully!");
+      navigate("/student"); // ✅ navigate after success
     } catch (error) {
       console.error("Failed to submit quiz:", error);
       alert("Error submitting quiz. Please try again.");
@@ -94,7 +95,7 @@ const AttemptQuiz: React.FC = () => {
 
   return (
     <>
-      <Header></Header>
+      <Header />
       <div className="max-w-4xl mx-auto p-6 bg-gray-50 min-h-screen">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-extrabold text-blue-700">
@@ -151,14 +152,12 @@ const AttemptQuiz: React.FC = () => {
           ))}
 
           <div className="text-center">
-            <Link to='/student'>
-              <button
-                type="submit"
-                className="mt-6 px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-full shadow-lg hover:from-blue-700 hover:to-blue-800 transition-transform transform hover:scale-105"
-              >
-                Submit Quiz
-              </button>
-            </Link>
+            <button
+              type="submit"
+              className="mt-6 px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-full shadow-lg hover:from-blue-700 hover:to-blue-800 transition-transform transform hover:scale-105"
+            >
+              Submit Quiz
+            </button>
           </div>
         </form>
       </div>

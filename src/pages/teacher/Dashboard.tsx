@@ -324,9 +324,9 @@ const TeacherDashboard: React.FC = () => {
                           <BarChart className="h-4 w-4 mr-2" />
                           Analytics
                         </Button>
-                        <Button size="sm">
-                          <Link to={`/teacher/view-quiz/${quiz.quizId || quiz.id || quiz._id}`}>View Details</Link>
-                        </Button>
+                        <Link to={`/teacher/quiz-details/${quiz.quizId || quiz.id || quiz._id}`}>
+                          <Button size="sm">View Details</Button>
+                        </Link>
                       </div>
                     </CardFooter>
                   </Card>
