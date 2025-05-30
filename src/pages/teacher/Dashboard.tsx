@@ -302,10 +302,13 @@ const TeacherDashboard: React.FC = () => {
                     </CardContent>
                     <CardFooter className="border-t pt-4">
                       <div className="w-full flex justify-between">
-                        <Button variant="outline" size="sm">
-                          <BarChart className="h-4 w-4 mr-2" />
-                          Analytics
-                        </Button>
+                        <Link to={`/teacher/quiz-analytics/${quiz.quizId}`}>
+                          <Button variant="outline" size="sm">
+                            <BarChart className="h-4 w-4 mr-2" />
+                                Analytics
+                           </Button>
+                        </Link>
+
                         <Link to={`/teacher/quiz-details/${quiz.quizId || quiz.id || quiz._id}`}>
                           <Button size="sm">View Details</Button>
                         </Link>

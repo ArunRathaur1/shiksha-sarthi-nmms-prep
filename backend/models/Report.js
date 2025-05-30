@@ -1,38 +1,32 @@
-const mongoose = require("mongoose");
 
-const reportSchema = new mongoose.Schema(
-  {
-    studentId: { type: String, ref: "Student",   index: true },
-    quizId: { type: String, ref: "Quiz",  index: true },
-    teacherId: { type: String, ref: "Teacher",  index: true },
-    schoolId: { type: String, ref: "School",  index: true },
+import mongoose from "mongoose";
 
-    class: { type: String,  index: true },
-    submittedAt: { type: Date, default: Date.now },
-    timeTakenInSeconds: { type: Number }, 
+const questionReportSchema = new mongoose.Schema({
+  questionId: { type: mongoose.Schema.Types.ObjectId, ref: "Question", required: true },
+  correctCount: { type: Number, default: 0 },
+  incorrectCount: { type: Number, default: 0 },
+  unattemptedCount: { type: Number, default: 0 }
+});
 
-    totalQuestions: { type: Number },
-    correct: { type: Number },
-    incorrect: { type: Number },
-    unattempted: { type: Number },
-    scorePercentage: { type: Number },
+const studentReportSchema = new mongoose.Schema({
+  quizId: { type: String, required: true },
+  studentId: { type: String, required: true },
+  correct: { type: Number, required: true },
+  incorrect: { type: Number, required: true },
+  unattempted: { type: Number, required: true },
+  answers: [
+    {
+      questionId: { type: mongoose.Schema.Types.ObjectId, ref: "Question" },
+      selectedAnswer: String,
+      isCorrect: Boolean,
+    }
+  ]
+});
 
-    questionsSolved: [{ type: String, ref: "Question" }],
+const quizReportSchema = new mongoose.Schema({
+  quizId: { type: String, required: true, unique: true },
+  questionStats: [questionReportSchema],
+});
 
-    answers: [
-      {
-        questionId: { type: String, ref: "Question",   },
-        selectedOption: { type: String },
-        isCorrect: { type: Boolean },
-        answeredAt: { type: Date }, 
-      },
-    ],
-
-    remarks: { type: String },
-  },
-  {
-    timestamps: true,
-  }
-);
-
-module.exports = mongoose.model("Report", reportSchema);
+export const StudentReport = mongoose.model("StudentReport", studentReportSchema);
+export const QuizReport = mongoose.model("QuizReport", quizReportSchema);

@@ -59,32 +59,48 @@ const AttemptQuiz: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    if (!student || !quiz) {
-      alert("Student or quiz data not loaded.");
-      return;
-    }
+  if (!student || !quiz) {
+    alert("Student or quiz data not loaded.");
+    return;
+  }
 
-    const payload = {
-      quizId: quiz.quizId,
-      answers: Object.entries(answers).map(([questionId, selectedAnswer]) => ({
-        questionId,
-        selectedAnswer,
-      })),
-    };
+  const answerList = Object.entries(answers).map(([questionId, selectedAnswer]) => ({
+    questionId,
+    selectedAnswer,
+  }));
 
-    try {
-      const response = await axios.patch(
-        `http://localhost:5000/students/${student.studentId}/attempt-quiz`,
-        payload
-      );
-      Cookies.set("quizResult", JSON.stringify(response.data), { expires: 7 });
-      alert("Quiz submitted successfully!");
-      navigate("/student"); // ✅ navigate after success
-    } catch (error) {
-      console.error("Failed to submit quiz:", error);
-      alert("Error submitting quiz. Please try again.");
-    }
+  const quizAttemptPayload = {
+    quizId: quiz.quizId,
+    answers: answerList,
   };
+
+  const reportPayload = {
+    quizId: quiz.quizId,
+    studentId: student.studentId,
+    answers: answerList,
+  };
+
+  try {
+    // 1. Submit quiz attempt
+    const attemptResponse = await axios.patch(
+      `http://localhost:5000/students/${student.studentId}/attempt-quiz`,
+      quizAttemptPayload
+    );
+
+    // 2. Submit report for student and questions
+    await axios.post(`http://localhost:5000/reports/submit-report`, reportPayload);
+
+    // 3. Save result in cookie
+    Cookies.set("quizResult", JSON.stringify(attemptResponse.data), { expires: 7 });
+
+    // 4. Notify and redirect
+    alert("Quiz submitted successfully!");
+    navigate("/student");
+  } catch (error) {
+    console.error("Failed to submit quiz or report:", error);
+    alert("Error submitting quiz. Please try again.");
+  }
+};
 
   if (!quiz)
     return (
