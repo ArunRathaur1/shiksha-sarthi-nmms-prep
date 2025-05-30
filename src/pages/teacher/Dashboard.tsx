@@ -131,25 +131,7 @@ const TeacherDashboard: React.FC = () => {
               </p>
             )}
           </div>
-          
-          {/* Debug info - remove in production */}
-          {/* {teacherData && (
-            <Card className="mb-6 border-blue-200 bg-blue-50">
-              <CardHeader>
-                <CardTitle className="text-sm text-blue-800">Teacher Information (Debug)</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-xs text-blue-700 space-y-1">
-                  <div>Name: {teacherData.name || teacherData.teacherName || 'Not found'}</div>
-                  <div>Teacher ID: {teacherData.teacherId || teacherData.id || 'Not found'}</div>
-                  <div>School ID: {teacherData.schoolId || teacherData.instituteId || 'Not found'}</div>
-                  <div>Email: {teacherData.email || 'Not found'}</div>
-                  <div>Subject: {teacherData.subject || 'Not found'}</div>
-                  <div>Phone: {teacherData.phone || 'Not found'}</div>
-                </div>
-              </CardContent>
-            </Card>
-          )} */}
+
           
           {/* Stats Overview Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
@@ -314,7 +296,7 @@ const TeacherDashboard: React.FC = () => {
                           <span>{quiz.questions?.length || quiz.questionCount || 0} questions</span>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">0 attempts</span>
+                          <span className="text-muted-foreground">{quiz.attemptedBy?.length} attempts</span>
                         </div>
                       </div>
                     </CardContent>
