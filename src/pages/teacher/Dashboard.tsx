@@ -1,12 +1,11 @@
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useAuth } from '@/contexts/AuthContext';
-import { useQuiz } from '@/contexts/QuizContext';
+import Cookies from 'js-cookie';
 import { 
   BookOpen, 
   ListChecks, 
@@ -19,10 +18,63 @@ import SubjectIcon from '@/components/SubjectIcon';
 
 const TeacherDashboard: React.FC = () => {
   const { user } = useAuth();
-  const { getTeacherQuizzes, quizAttempts } = useQuiz();
+  const [teacherQuizzes, setTeacherQuizzes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   
-  // Get quizzes created by the current teacher
-  const teacherQuizzes = user ? getTeacherQuizzes(user.id) : [];
+  // Teacher data from cookies
+  const [teacherId, setTeacherId] = useState("");
+  const [teacherName, setTeacherName] = useState("");
+  const [schoolId, setSchoolId] = useState("");
+  const [teacherData, setTeacherData] = useState(null);
+
+  // Fetch quizzes created by the teacher
+  useEffect(() => {
+    const fetchTeacherQuizzes = async () => {
+      const teacherCookie = Cookies.get("teacher");
+      if (!teacherCookie) {
+        setError('Teacher cookie not found');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const parsed = JSON.parse(teacherCookie);
+        const teacherInfo = parsed.teacher;
+        
+        // Extract all teacher information from cookie
+        setTeacherId(teacherInfo.teacherId || teacherInfo.id || "");
+        setTeacherName(teacherInfo.name || teacherInfo.teacherName || "");
+        setSchoolId(teacherInfo.schoolId || teacherInfo.instituteId || "");
+        setTeacherData(teacherInfo);
+        
+        console.log('Teacher data from cookie:', teacherInfo); // Debug log
+
+        const teacherIdFromCookie = teacherInfo.teacherId || teacherInfo.id;
+        
+        if (!teacherIdFromCookie) {
+          throw new Error('Teacher ID not found in cookie');
+        }
+
+        const response = await fetch(`http://localhost:5000/teachers/${teacherIdFromCookie}/quizzes`);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('API Response:', data); // Debug log to see the structure
+        setTeacherQuizzes(Array.isArray(data) ? data : []);
+      } catch (err) {
+        setError(`Failed to fetch quizzes: ${err.message}`);
+        console.error('Error fetching teacher quizzes:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTeacherQuizzes();
+  }, []);
   
   // Mock data for the dashboard
   const statsData = [
@@ -34,7 +86,7 @@ const TeacherDashboard: React.FC = () => {
     },
     { 
       title: "Total Quizzes", 
-      value: teacherQuizzes.length.toString(),
+      value: loading ? "..." : teacherQuizzes.length.toString(),
       icon: <ListChecks className="h-8 w-8 text-edu-green" />,
       description: "Created by you",
     },
@@ -68,12 +120,36 @@ const TeacherDashboard: React.FC = () => {
         <div className="edu-container">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900">
-              Welcome, {user?.name}!
+              Welcome, {teacherName || user?.name || 'Teacher'}!
             </h1>
             <p className="text-gray-600">
-              Teacher Dashboard | Institute ID: {user?.instituteId}
+              Teacher Dashboard | School ID: {schoolId || user?.instituteId || 'N/A'}
             </p>
+            {teacherId && (
+              <p className="text-sm text-gray-500 mt-1">
+                Teacher ID: {teacherId}
+              </p>
+            )}
           </div>
+          
+          {/* Debug info - remove in production */}
+          {/* {teacherData && (
+            <Card className="mb-6 border-blue-200 bg-blue-50">
+              <CardHeader>
+                <CardTitle className="text-sm text-blue-800">Teacher Information (Debug)</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-xs text-blue-700 space-y-1">
+                  <div>Name: {teacherData.name || teacherData.teacherName || 'Not found'}</div>
+                  <div>Teacher ID: {teacherData.teacherId || teacherData.id || 'Not found'}</div>
+                  <div>School ID: {teacherData.schoolId || teacherData.instituteId || 'Not found'}</div>
+                  <div>Email: {teacherData.email || 'Not found'}</div>
+                  <div>Subject: {teacherData.subject || 'Not found'}</div>
+                  <div>Phone: {teacherData.phone || 'Not found'}</div>
+                </div>
+              </CardContent>
+            </Card>
+          )} */}
           
           {/* Stats Overview Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
@@ -190,18 +266,44 @@ const TeacherDashboard: React.FC = () => {
               </Link>
             </div>
             
-            {teacherQuizzes.length > 0 ? (
+            {loading ? (
+              <Card>
+                <CardContent className="py-12">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-edu-blue mx-auto mb-4"></div>
+                    <p className="text-muted-foreground">Loading your quizzes...</p>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : error ? (
+              <Card>
+                <CardContent className="py-12">
+                  <div className="text-center">
+                    <div className="text-red-500 mb-4">⚠️</div>
+                    <h3 className="text-xl font-medium text-gray-900 mb-2">
+                      Error Loading Quizzes
+                    </h3>
+                    <p className="text-muted-foreground mb-6">
+                      {error}
+                    </p>
+                    <Button onClick={() => window.location.reload()}>
+                      Try Again
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : teacherQuizzes.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {teacherQuizzes.map((quiz, idx) => (
-                  <Card key={idx}>
+                  <Card key={quiz.id || quiz._id || idx}>
                     <CardHeader className="pb-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
-                          <SubjectIcon subject={quiz.subject} size={20} />
-                          <CardTitle className="text-lg">{quiz.title}</CardTitle>
+                          <SubjectIcon subject={quiz.subject || 'general'} size={20} />
+                          <CardTitle className="text-lg">{quiz.title || quiz.quizId || 'Untitled Quiz'}</CardTitle>
                         </div>
                         <div className="bg-primary/10 text-primary text-xs py-1 px-2 rounded">
-                          ID: {quiz.id}
+                          ID: {quiz.quizId || quiz.id || quiz._id || 'N/A'}
                         </div>
                       </div>
                     </CardHeader>
@@ -209,7 +311,7 @@ const TeacherDashboard: React.FC = () => {
                       <div className="flex items-center justify-between text-sm">
                         <div className="flex items-center space-x-2">
                           <Layers className="h-4 w-4 text-muted-foreground" />
-                          <span>{quiz.questions.length} questions</span>
+                          <span>{quiz.questions?.length || quiz.questionCount || 0} questions</span>
                         </div>
                         <div>
                           <span className="text-muted-foreground">0 attempts</span>
@@ -223,7 +325,7 @@ const TeacherDashboard: React.FC = () => {
                           Analytics
                         </Button>
                         <Button size="sm">
-                          <Link to={`/teacher/view-quiz/${quiz.id}`}>View Details</Link>
+                          <Link to={`/teacher/view-quiz/${quiz.quizId || quiz.id || quiz._id}`}>View Details</Link>
                         </Button>
                       </div>
                     </CardFooter>
