@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom"; // ✅ include useNavigate
 import axios from "axios";
-import { Link } from "react-router-dom";
 import Cookies from "js-cookie";
 import Header from "@/components/Header";
 
@@ -26,6 +25,7 @@ interface Student {
 
 const AttemptQuiz: React.FC = () => {
   const { id } = useParams();
+  const navigate = useNavigate(); // ✅ create navigate instance
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [answers, setAnswers] = useState<{ [key: string]: string }>({});
   const [student, setStudent] = useState<Student | null>(null);
@@ -59,31 +59,48 @@ const AttemptQuiz: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    if (!student || !quiz) {
-      alert("Student or quiz data not loaded.");
-      return;
-    }
+  if (!student || !quiz) {
+    alert("Student or quiz data not loaded.");
+    return;
+  }
 
-    const payload = {
-      quizId: quiz.quizId,
-      answers: Object.entries(answers).map(([questionId, selectedAnswer]) => ({
-        questionId,
-        selectedAnswer,
-      })),
-    };
+  const answerList = Object.entries(answers).map(([questionId, selectedAnswer]) => ({
+    questionId,
+    selectedAnswer,
+  }));
 
-    try {
-      const response = await axios.patch(
-        `http://localhost:5000/students/${student.studentId}/attempt-quiz`,
-        payload
-      );
-      Cookies.set("quizResult", JSON.stringify(response.data), { expires: 7 });
-      alert("Quiz submitted successfully!");
-    } catch (error) {
-      console.error("Failed to submit quiz:", error);
-      alert("Error submitting quiz. Please try again.");
-    }
+  const quizAttemptPayload = {
+    quizId: quiz.quizId,
+    answers: answerList,
   };
+
+  const reportPayload = {
+    quizId: quiz.quizId,
+    studentId: student.studentId,
+    answers: answerList,
+  };
+
+  try {
+    // 1. Submit quiz attempt
+    const attemptResponse = await axios.patch(
+      `http://localhost:5000/students/${student.studentId}/attempt-quiz`,
+      quizAttemptPayload
+    );
+
+    // 2. Submit report for student and questions
+    await axios.post(`http://localhost:5000/reports/submit-report`, reportPayload);
+
+    // 3. Save result in cookie
+    Cookies.set("quizResult", JSON.stringify(attemptResponse.data), { expires: 7 });
+
+    // 4. Notify and redirect
+    alert("Quiz submitted successfully!");
+    navigate("/student");
+  } catch (error) {
+    console.error("Failed to submit quiz or report:", error);
+    alert("Error submitting quiz. Please try again.");
+  }
+};
 
   if (!quiz)
     return (
@@ -94,7 +111,7 @@ const AttemptQuiz: React.FC = () => {
 
   return (
     <>
-      <Header></Header>
+      <Header />
       <div className="max-w-4xl mx-auto p-6 bg-gray-50 min-h-screen">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-extrabold text-blue-700">
@@ -151,14 +168,12 @@ const AttemptQuiz: React.FC = () => {
           ))}
 
           <div className="text-center">
-            <Link to='/student'>
-              <button
-                type="submit"
-                className="mt-6 px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-full shadow-lg hover:from-blue-700 hover:to-blue-800 transition-transform transform hover:scale-105"
-              >
-                Submit Quiz
-              </button>
-            </Link>
+            <button
+              type="submit"
+              className="mt-6 px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-full shadow-lg hover:from-blue-700 hover:to-blue-800 transition-transform transform hover:scale-105"
+            >
+              Submit Quiz
+            </button>
           </div>
         </form>
       </div>

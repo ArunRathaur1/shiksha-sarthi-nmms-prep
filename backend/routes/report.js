@@ -1,108 +1,130 @@
 const express = require("express");
+const StudentReport = require("../models/StudentReport.js");
+const QuizReport = require("../models/QuizReport.js");
+const Question = require("../models/Question.js");
+const Quiz = require("../models/Quiz.js");
+
 const router = express.Router();
-const Report = require("../models/Report");
 
-// Get all reports
-router.get("/", async (req, res) => {
+// Generate student + question report on quiz submission
+router.post("/submit-report", async (req, res) => {
+  const { quizId, studentId, answers } = req.body;
+
   try {
-    const reports = await Report.find()
-      .populate("studentId")
-      .populate("quizId")
-      .populate("teacherId")
-      .populate("schoolId")
-      .populate("answers.questionId");
-    res.status(200).json(reports);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+    const quiz = await Quiz.findOne({ quizId }).populate("questions");
+    if (!quiz) return res.status(404).json({ error: "Quiz not found" });
 
-// Get reports by studentId
-router.get("/student/:studentId", async (req, res) => {
-  try {
-    const reports = await Report.find({ studentId: req.params.studentId })
-      .populate("quizId")
-      .populate("answers.questionId");
-    res.status(200).json(reports);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+    let correct = 0,
+      incorrect = 0,
+      unattempted = 0;
 
-// Get reports by quizId
-router.get("/quiz/:quizId", async (req, res) => {
-  try {
-    const reports = await Report.find({ quizId: req.params.quizId })
-      .populate("studentId")
-      .populate("answers.questionId");
-    res.status(200).json(reports);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Get reports by teacherId
-router.get("/teacher/:teacherId", async (req, res) => {
-  try {
-    const reports = await Report.find({ teacherId: req.params.teacherId })
-      .populate("quizId")
-      .populate("studentId");
-    res.status(200).json(reports);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Get reports by schoolId
-router.get("/school/:schoolId", async (req, res) => {
-  try {
-    const reports = await Report.find({ schoolId: req.params.schoolId });
-    res.status(200).json(reports);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Get single report by ID
-router.get("/:id", async (req, res) => {
-  try {
-    const report = await Report.findById(req.params.id)
-      .populate("studentId")
-      .populate("quizId")
-      .populate("teacherId")
-      .populate("answers.questionId");
-    if (!report) return res.status(404).json({ message: "Report not found" });
-    res.status(200).json(report);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Question-wise analysis for a quiz: How many got each question right/wrong
-router.get("/quiz/:quizId/question-analysis", async (req, res) => {
-  try {
-    const reports = await Report.find({ quizId: req.params.quizId });
-
-    const questionStats = {};
-
-    reports.forEach((report) => {
-      report.answers.forEach(({ questionId, isCorrect }) => {
-        if (!questionStats[questionId]) {
-          questionStats[questionId] = { correct: 0, incorrect: 0, total: 0 };
+    const studentAnswers = await Promise.all(
+      quiz.questions.map(async (q) => {
+        const answerObj = answers.find((a) => a.questionId === q._id.toString());
+        if (!answerObj) {
+          unattempted++;
+          await updateQuizReport(quizId, q._id, "unattempted");
+          return {
+            questionId: q._id,
+            selectedAnswer: null,
+            isCorrect: false,
+          };
         }
-        if (isCorrect) {
-          questionStats[questionId].correct++;
-        } else {
-          questionStats[questionId].incorrect++;
-        }
-        questionStats[questionId].total++;
-      });
+
+        const isCorrect = answerObj.selectedAnswer === q.correctAnswer;
+        if (isCorrect) correct++;
+        else incorrect++;
+
+        await updateQuizReport(quizId, q._id, isCorrect ? "correct" : "incorrect");
+
+        return {
+          questionId: q._id,
+          selectedAnswer: answerObj.selectedAnswer,
+          isCorrect,
+        };
+      })
+    );
+
+    const studentReport = new StudentReport({
+      quizId,
+      studentId,
+      correct,
+      incorrect,
+      unattempted,
+      answers: studentAnswers,
     });
 
-    res.status(200).json(questionStats);
+    await studentReport.save();
+    res.status(201).json({ message: "Report generated" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
+
+// Utility to update QuizReport stats
+async function updateQuizReport(quizId, questionId, status) {
+  const quizReport = await QuizReport.findOneAndUpdate(
+    { quizId },
+    {},
+    { upsert: true, new: true }
+  );
+
+  const questionStat = quizReport.questionStats.find(
+    (stat) => stat.questionId.toString() === questionId.toString()
+  );
+
+  if (questionStat) {
+    if (status === "correct") questionStat.correctCount++;
+    if (status === "incorrect") questionStat.incorrectCount++;
+    if (status === "unattempted") questionStat.unattemptedCount++;
+  } else {
+    quizReport.questionStats.push({
+      questionId,
+      correctCount: status === "correct" ? 1 : 0,
+      incorrectCount: status === "incorrect" ? 1 : 0,
+      unattemptedCount: status === "unattempted" ? 1 : 0,
+    });
+  }
+
+  await quizReport.save();
+}
+
+// GET student performance
+router.get("/student/:studentId", async (req, res) => {
+  const { studentId } = req.params;
+  try {
+    const reports = await StudentReport.find({ studentId }).populate("answers.questionId");
+    res.json(reports);
+  } catch (err) {
+    res.status(500).json({ error: "Error fetching student report" });
+  }
+});
+
+// GET questionwise report for quiz
+router.get("/quiz/:quizId", async (req, res) => {
+   const { quizId } = req.params; 
+  try {
+    const quizReport = await QuizReport.findOne({ quizId }).populate("questionStats.questionId");
+    if (!quizReport) return res.status(404).json({ error: "No report for this quiz" });
+    res.json(quizReport);
+  } catch (err) {
+    res.status(500).json({ error: "Error fetching quiz report" });
+  }
+});
+
+// GET all student reports for a specific quiz
+router.get("/student-quiz/:quizId", async (req, res) => {
+  const { quizId } = req.params;
+
+  try {
+    const reports = await StudentReport.find({ quizId });
+    res.json(reports);
+  } catch (err) {
+    console.error("Error fetching student quiz reports:", err);
+    res.status(500).json({ error: "Error fetching reports" });
+  }
+});
+
 
 module.exports = router;

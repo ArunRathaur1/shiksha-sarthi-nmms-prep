@@ -3,6 +3,7 @@ const router = express.Router();
 const Teacher = require("../models/Teacher");
 const Quiz = require("../models/Quiz");
 const Question = require("../models/Question");
+const School = require("../models/School");
 
 // Create a new teacher
 router.post("/", async (req, res) => {
@@ -141,5 +142,25 @@ router.post("/:teacherId/create-quiz", async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
+
+// GET /teachers/:teacherId/quizzes
+router.get("/:teacherId/quizzes", async (req, res) => {
+  try {
+    const teacher = await Teacher.findOne({ teacherId: req.params.teacherId }).populate("quizzesCreated");
+
+    if (!teacher) {
+      return res.status(404).json({ error: "Teacher not found" });
+    }
+
+    res.status(200).json(teacher.quizzesCreated);
+  } catch (err) {
+    console.error("Error fetching teacher quizzes:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
+
+
 
 module.exports = router;
