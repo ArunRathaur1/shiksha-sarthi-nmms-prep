@@ -2,9 +2,9 @@ import { useState } from "react";
 
 export default function SimpleQuestionForm() {
   const initialFormState = {
-    subject: "",
-    class: "",
-    topic: "",
+    subject: "विज्ञान",
+    class: "NMMS",
+    topic: "ताप संचरण",
     question: "",
     options: ["", "", "", ""],
     correctAnswer: "",

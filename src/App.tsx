@@ -26,6 +26,7 @@ import SubjectTopics from "./pages/student/SubjectTopics";
 
 // Question Page
 import Upload_question from "./components/questions/Upload_question";
+import LoginStudent from "./pages/LoginStudent";
 
 // Teacher Pages
 import TeacherDashboard from "./pages/teacher/Dashboard";
@@ -59,7 +60,7 @@ const AppRoutes = () => {
       <Route path="/student/group-quiz" element={<GroupQuiz />} />
       <Route path='/studentreport/:id' element={<StudentReport></StudentReport>}></Route>
       <Route path='/singlequiz/:id' element={<SingleQuizReport></SingleQuizReport>}></Route>
-
+      <Route path='/login/student' element={<LoginStudent></LoginStudent>}></Route>
 
       {/* Quiz */}
       <Route path="/attemptquiz/:id" element={<AttemptQuiz></AttemptQuiz>}></Route>

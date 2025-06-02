@@ -51,19 +51,16 @@ const Login: React.FC = () => {
 
       const response = await axios.post(url, payload);
 
-      // ✅ Store login data in cookie
       if (role === "teacher") {
+        // ✅ Store teacher data in cookie
         Cookies.set("teacher", JSON.stringify(response.data), {
           expires: 7,
           secure: true,
           sameSite: "strict",
         });
       } else {
-        Cookies.set("student", JSON.stringify(response.data), {
-          expires: 7,
-          secure: true,
-          sameSite: "strict",
-        });
+        // ✅ Store student data in localStorage
+        localStorage.setItem("student", JSON.stringify(response.data));
       }
 
       toast({

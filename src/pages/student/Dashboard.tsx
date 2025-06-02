@@ -38,15 +38,13 @@ const StudentDashboard: React.FC = () => {
   const [quizId, setQuizId] = useState("");
 
   useEffect(() => {
-    const cookieData = Cookies.get("student");
-    const parsedData = JSON.parse(cookieData);
-    const studentClass = parsedData.student?.class;
-    console.log("Student Class:", studentClass);
-    console.log(cookieData);
-    if (cookieData) {
+    const localData = localStorage.getItem("student");
+
+    if (localData) {
       try {
-        const parsed = JSON.parse(cookieData);
-        const studentId = parsed.student?.studentId;
+        const parsedData = JSON.parse(localData);
+        const studentClass = parsedData.student?.class;
+        const studentId = parsedData.student?.studentId;
 
         if (studentId) {
           axios
@@ -59,7 +57,7 @@ const StudentDashboard: React.FC = () => {
             });
         }
       } catch (e) {
-        console.error("Failed to parse student cookie data", e);
+        console.error("Failed to parse student local storage data", e);
       }
     }
   }, []);
