@@ -31,7 +31,9 @@ const AttemptQuiz: React.FC = () => {
   const [student, setStudent] = useState<Student | null>(null);
 
   useEffect(() => {
-    const studentData = Cookies.get("student");
+    
+    const studentData = localStorage.getItem("student");
+    console.log(studentData);
     if (studentData) {
       try {
         const parsedStudent = JSON.parse(studentData);
