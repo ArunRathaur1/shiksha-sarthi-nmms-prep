@@ -12,6 +12,7 @@ interface Question {
     text: string;
     visualLinks?: string[];
   };
+
 }
 
 interface Answer {
@@ -40,15 +41,16 @@ const SingleQuizReport: React.FC = () => {
   useEffect(() => {
     const fetchQuizReport = async () => {
       try {
-        const cookieData = Cookies.get("student");
+        const cookieData = localStorage.getItem("student");
         if (!cookieData) throw new Error("No student cookie found");
 
         const student = JSON.parse(cookieData);
         const studentId = student.student.studentId;
 
-        const studentRes = await axios.get(
-          `http://localhost:5000/students/${studentId}`
-        );
+        const [studentRes, quizRes] = await Promise.all([
+          axios.get(`http://localhost:5000/students/${studentId}`),
+          axios.get(`http://localhost:5000/quizzes/${id}`),
+        ]);
 
         const studentData = studentRes.data;
         const quizAttempt: QuizAttempt | undefined =
@@ -57,19 +59,12 @@ const SingleQuizReport: React.FC = () => {
           );
 
         if (!quizAttempt) throw new Error("Quiz not found");
-
         setQuiz(quizAttempt);
 
-        // Fetch all question details
-        const questionIds = quizAttempt.answers.map((ans) => ans.questionId);
-        const responses = await Promise.all(
-          questionIds.map((qid) =>
-            axios.get(`http://localhost:5000/questions/${qid}`)
-          )
-        );
+        const fullQuiz = quizRes.data;
+        const fullQuestions = fullQuiz.questions;
 
-        const questionData = responses.map((res) => res.data);
-        setQuestions(questionData);
+        setQuestions(fullQuestions);
       } catch (err) {
         console.error("Error fetching quiz report:", err);
       } finally {
@@ -103,19 +98,35 @@ const SingleQuizReport: React.FC = () => {
         Attempted At: {new Date(quiz.attemptedAt).toLocaleString()}
       </p>
 
-      <div className="mb-6 bg-gray-100 p-4 rounded">
-        <h2 className="text-lg font-semibold">Score Summary</h2>
-        <p>Correct: {quiz.score.correct}</p>
-        <p>Incorrect: {quiz.score.incorrect}</p>
-        <p>Unattempted: {quiz.score.unattempted}</p>
-      </div>
+      {/* ✅ Score Summary (calculated live) */}
+<div className="mb-6 bg-gray-100 p-4 rounded">
+  <h2 className="text-lg font-semibold">Score Summary</h2>
+  <p>
+    Correct:{" "}
+    {
+      quiz.answers.filter((ans) => ans.isCorrect).length
+    }
+  </p>
+  <p>
+    Incorrect:{" "}
+    {
+      quiz.answers.filter((ans) => !ans.isCorrect).length
+    }
+  </p>
+  <p>
+    Unattempted: {questions.length - quiz.answers.length}
+  </p>
+</div>
+
 
       {questions.map((question, index) => {
         const answer = quiz.answers.find(
           (ans) => ans.questionId === question._id
         );
-        const isCorrect = answer?.isCorrect;
-        const selected = answer?.selectedAnswer;
+
+        const isCorrect = answer?.isCorrect ?? false;
+        const selected = answer?.selectedAnswer ?? null;
+        const attempted = !!answer;
 
         return (
           <div
@@ -153,6 +164,13 @@ const SingleQuizReport: React.FC = () => {
                 );
               })}
             </div>
+
+            {/* ✅ Show this only once per question */}
+            {!attempted && (
+              <p className="text-sm text-yellow-600 mt-2 font-medium">
+                Question was not attempted.
+              </p>
+            )}
 
             {question.hint?.text && (
               <div className="text-sm text-gray-600 mt-2">

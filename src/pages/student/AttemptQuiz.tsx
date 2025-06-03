@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom"; // ✅ include useNavigate
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Cookies from "js-cookie";
 import Header from "@/components/Header";
@@ -9,6 +9,7 @@ interface Question {
   question: string;
   options: string[];
   correctAnswer: string;
+  questionImage: string;
 }
 
 interface Quiz {
@@ -25,21 +26,19 @@ interface Student {
 
 const AttemptQuiz: React.FC = () => {
   const { id } = useParams();
-  const navigate = useNavigate(); // ✅ create navigate instance
+  const navigate = useNavigate();
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [answers, setAnswers] = useState<{ [key: string]: string }>({});
   const [student, setStudent] = useState<Student | null>(null);
 
   useEffect(() => {
-    
     const studentData = localStorage.getItem("student");
-    console.log(studentData);
     if (studentData) {
       try {
         const parsedStudent = JSON.parse(studentData);
         setStudent(parsedStudent.student);
       } catch (error) {
-        console.error("Invalid student cookie data");
+        console.error("Invalid student data in localStorage.");
       }
     }
   }, []);
@@ -57,68 +56,76 @@ const AttemptQuiz: React.FC = () => {
   }, [id]);
 
   const handleOptionChange = (questionId: string, selectedOption: string) => {
-    setAnswers((prev) => ({ ...prev, [questionId]: selectedOption }));
+    setAnswers((prev) => ({
+      ...prev,
+      [questionId]: selectedOption,
+    }));
+  };
+
+  const handleClearSelection = (questionId: string) => {
+    setAnswers((prev) => {
+      const newAnswers = { ...prev };
+      delete newAnswers[questionId];
+      return newAnswers;
+    });
   };
 
   const handleSubmit = async () => {
-  if (!student || !quiz) {
-    alert("Student or quiz data not loaded.");
-    return;
-  }
+    if (!student || !quiz) {
+      alert("Student or quiz data not loaded.");
+      return;
+    }
 
-  const answerList = Object.entries(answers).map(([questionId, selectedAnswer]) => ({
-    questionId,
-    selectedAnswer,
-  }));
-
-  const quizAttemptPayload = {
-    quizId: quiz.quizId,
-    answers: answerList,
-  };
-
-  const reportPayload = {
-    quizId: quiz.quizId,
-    studentId: student.studentId,
-    answers: answerList,
-  };
-
-  try {
-    // 1. Submit quiz attempt
-    const attemptResponse = await axios.patch(
-      `http://localhost:5000/students/${student.studentId}/attempt-quiz`,
-      quizAttemptPayload
+    const answerList = Object.entries(answers).map(
+      ([questionId, selectedAnswer]) => ({
+        questionId,
+        selectedAnswer,
+      })
     );
 
-    // 2. Submit report for student and questions
-    await axios.post(`http://localhost:5000/reports/submit-report`, reportPayload);
+    const quizAttemptPayload = {
+      quizId: quiz.quizId,
+      answers: answerList,
+    };
 
-    // 3. Save result in cookie
-    Cookies.set("quizResult", JSON.stringify(attemptResponse.data), { expires: 7 });
+    const reportPayload = {
+      quizId: quiz.quizId,
+      studentId: student.studentId,
+      answers: answerList,
+    };
 
-    // 4. Notify and redirect
-    alert("Quiz submitted successfully!");
-    navigate("/student");
-  } catch (error) {
-    console.error("Failed to submit quiz or report:", error);
-    alert("Error submitting quiz. Please try again.");
-  }
-};
+    try {
+      const attemptResponse = await axios.patch(
+        `http://localhost:5000/students/${student.studentId}/attempt-quiz`,
+        quizAttemptPayload
+      );
 
-  if (!quiz)
+      await axios.post(`http://localhost:5000/reports/submit-report`, reportPayload);
+
+      Cookies.set("quizResult", JSON.stringify(attemptResponse.data), { expires: 7 });
+
+      alert("Quiz submitted successfully!");
+      navigate("/student");
+    } catch (error) {
+      console.error("Failed to submit quiz or report:", error);
+      alert("Error submitting quiz. Please try again.");
+    }
+  };
+
+  if (!quiz) {
     return (
       <div className="text-center mt-20 text-lg font-semibold">
         Loading quiz...
       </div>
     );
+  }
 
   return (
     <>
       <Header />
       <div className="max-w-4xl mx-auto p-6 bg-gray-50 min-h-screen">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-extrabold text-blue-700">
-            Quiz Attempt
-          </h1>
+          <h1 className="text-4xl font-extrabold text-blue-700">Quiz Attempt</h1>
           <p className="text-gray-600 mt-2 text-lg">Quiz ID: {quiz.quizId}</p>
         </div>
 
@@ -148,6 +155,17 @@ const AttemptQuiz: React.FC = () => {
               <h3 className="font-bold text-lg text-gray-800 mb-3">
                 Q{index + 1}. {question.question}
               </h3>
+
+              {question.questionImage && (
+                <div className="mb-4">
+                  <img
+                    src={question.questionImage}
+                    alt={`Question ${index + 1} Image`}
+                    className="max-w-full h-auto rounded-md shadow"
+                  />
+                </div>
+              )}
+
               <div className="space-y-3">
                 {question.options.map((option) => (
                   <label
@@ -165,6 +183,16 @@ const AttemptQuiz: React.FC = () => {
                     <span className="text-gray-700">{option}</span>
                   </label>
                 ))}
+              </div>
+
+              <div className="mt-3">
+                <button
+                  type="button"
+                  onClick={() => handleClearSelection(question._id)}
+                  className="text-sm text-red-600 underline hover:text-red-800"
+                >
+                  Clear Selection
+                </button>
               </div>
             </div>
           ))}
