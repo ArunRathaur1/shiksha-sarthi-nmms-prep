@@ -12,6 +12,7 @@ interface Question {
     text: string;
     visualLinks?: string[];
   };
+  questionImage?: string;
 
 }
 
@@ -171,6 +172,16 @@ const SingleQuizReport: React.FC = () => {
                 Question was not attempted.
               </p>
             )}
+            {question.questionImage && (
+  <div className="mt-3">
+    <img
+      src={question.questionImage}
+      alt={`Q${index + 1} Illustration`}
+      className="max-w-full h-auto rounded shadow"
+    />
+  </div>
+)}
+
 
             {question.hint?.text && (
               <div className="text-sm text-gray-600 mt-2">
