@@ -157,11 +157,12 @@ const AttemptQuiz: React.FC = () => {
               </h3>
 
               {question.questionImage && (
-                <div className="mb-4">
+                <div className="mb-4" >
                   <img
                     src={question.questionImage}
                     alt={`Question ${index + 1} Image`}
                     className="max-w-full h-auto rounded-md shadow"
+                    style={{height:"400px",width:"700px"}}
                   />
                 </div>
               )}
