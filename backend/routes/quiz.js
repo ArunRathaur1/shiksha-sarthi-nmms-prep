@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Quiz = require("../models/Quiz");
 const Teacher = require("../models/Teacher"); // adjust the path as needed
+const Question = require("../models/Question");
 
 
 // Create a new quiz
@@ -96,6 +97,42 @@ router.get("/student/:studentId", async (req, res) => {
     res.status(200).json(quizzes);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+router.post("/:quizId/custom-question", async (req, res) => {
+  try {
+    const { quizId } = req.params;
+    const { question, questionImage, options, correctAnswer, teacherId } = req.body;
+
+    if (!question || !options || !correctAnswer || !teacherId) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    const newQuestion = new Question({
+      question,
+      questionImage,
+      options,
+      correctAnswer,
+      teacherId,
+      class: "custom",
+      subject: "custom",
+      topic: "custom",
+      isCustom: true,
+    });
+
+    await newQuestion.save();
+
+    const quiz = await Quiz.findOne({ quizId });
+    if (!quiz) return res.status(404).json({ error: "Quiz not found" });
+
+    quiz.questions.push(newQuestion._id);
+    await quiz.save();
+
+    res.status(201).json({ message: "Custom question added", question: newQuestion });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
