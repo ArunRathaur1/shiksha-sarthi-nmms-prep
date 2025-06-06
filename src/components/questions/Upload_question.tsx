@@ -4,7 +4,7 @@ export default function SimpleQuestionForm() {
   const initialFormState = {
     subject: "विज्ञान",
     class: "NMMS",
-    topic: "ताप संचरण",
+    topic: "",
     question: "",
     options: ["", "", "", ""],
     correctAnswer: "",
