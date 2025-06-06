@@ -23,10 +23,10 @@ const questionSchema = new mongoose.Schema({
     image: { type: String },
     video: { type: String },
   },
-  teacherId: {
-    type: String,
-    ref: "Teacher", 
-  },
+  // teacherId: {
+  //   type: String,
+  //   ref: "Teacher", 
+  // },
 });
 
 module.exports = mongoose.model("Question", questionSchema);

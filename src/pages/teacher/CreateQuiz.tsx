@@ -11,18 +11,26 @@ interface Question {
   topic: string;
   question: string;
   options: string[];
+  questionImage?: string;
 }
 
 export default function CreateQuiz() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [filteredQuestions, setFilteredQuestions] = useState<Question[]>([]);
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
+  const [customQuestions, setCustomQuestions] = useState<any[]>([]);
   const [teacherId, setTeacherId] = useState("");
+  const [quizId, setQuizId] = useState("");
   const [subjectFilter, setSubjectFilter] = useState("");
   const [topicFilter, setTopicFilter] = useState("");
 
-  // New state for quizId input
-  const [quizId, setQuizId] = useState("");
+  const [showCustomForm, setShowCustomForm] = useState(false);
+  const [customForm, setCustomForm] = useState({
+    question: "",
+    questionImage: "",
+    options: ["", "", "", ""],
+    correctAnswer: "",
+  });
 
   const { toast } = useToast();
 
@@ -35,13 +43,11 @@ export default function CreateQuiz() {
       axios
         .get("http://localhost:5000/questions/")
         .then((res) => {
-          const allQuestions = res.data;
-          const filteredByTeacher = allQuestions.filter((q: any) => {
-            return !q.teacherId || q.teacherId === parsed.teacher.teacherId;
-          });
-
-          setQuestions(filteredByTeacher);
-          setFilteredQuestions(filteredByTeacher);
+          const teacherQuestions = res.data.filter(
+            (q: any) => !q.teacherId || q.teacherId === parsed.teacher.teacherId
+          );
+          setQuestions(teacherQuestions);
+          setFilteredQuestions(teacherQuestions);
         })
         .catch(() => {
           toast({
@@ -52,7 +58,6 @@ export default function CreateQuiz() {
         });
     }
   }, []);
-  
 
   const handleFilter = () => {
     const filtered = questions.filter(
@@ -69,48 +74,113 @@ export default function CreateQuiz() {
     );
   };
 
-  const handleSubmit = async () => {
-  if (!teacherId || selectedQuestions.length === 0 || !quizId.trim()) {
-    toast({
-      title: "Error",
-      description:
-        "Please select questions, enter Quiz ID, and ensure you're logged in as a teacher",
-      variant: "destructive",
-    });
-    return;
-  }
+  const handleCustomFormChange = (e: any, index?: number) => {
+    if (index !== undefined) {
+      const newOptions = [...customForm.options];
+      newOptions[index] = e.target.value;
+      setCustomForm({ ...customForm, options: newOptions });
+    } else {
+      setCustomForm({ ...customForm, [e.target.name]: e.target.value });
+    }
+  };
 
-  try {
-    const payload = {
+  const addCustomQuestionLocally = () => {
+    const { question, questionImage, options, correctAnswer } = customForm;
+    if (!question || !correctAnswer || options.includes("")) {
+      return toast({
+        title: "Error",
+        description: "Please fill all fields for the custom question",
+        variant: "destructive",
+      });
+    }
+
+    const tempId = `custom-${Date.now()}`;
+    const newQ = {
+      _id: tempId,
+      question,
+      questionImage,
+      options,
+      subject: "custom",
+      class: "custom",
+      topic: "custom",
       teacherId,
-      quizId: quizId.trim(),
-      questions: selectedQuestions,
     };
 
-    console.log("Submitting quiz with payload:", payload); // ✅ Debug log
-
-    const res = await axios.post("http://localhost:5000/quizzes/", payload);
-
-    console.log("Quiz creation success:", res.data); // ✅ Debug log
-
-    toast({
-      title: "Quiz Created",
-      description: `Your quiz "${res.data.quizId}" was successfully created!`,
+    setCustomQuestions([...customQuestions, newQ]);
+    setSelectedQuestions([...selectedQuestions, tempId]);
+    setCustomForm({
+      question: "",
+      questionImage: "",
+      options: ["", "", "", ""],
+      correctAnswer: "",
     });
+    setShowCustomForm(false);
+  };
 
-    setSelectedQuestions([]);
-    setQuizId("");
-  } catch (error: any) {
-    console.error("Quiz creation failed:", error); // ✅ Debug log
+  const handleSubmit = async () => {
+    if (!teacherId || !quizId.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter quiz ID and ensure you're logged in",
+        variant: "destructive",
+      });
+      return;
+    }
 
-    toast({
-      title: "Error",
-      description: error.response?.data?.error || "Failed to create quiz",
-      variant: "destructive",
-    });
-  }
-};
+    try {
+      // First, create the quiz without questions
+      const quizRes = await axios.post("http://localhost:5000/quizzes/", {
+        teacherId,
+        quizId: quizId.trim(),
+        questions: [],
+      });
 
+      const createdQuiz = quizRes.data;
+
+      // Upload custom questions and collect their _ids
+      const uploadedCustomIds = [];
+      for (let q of customQuestions) {
+        const res = await axios.post(
+          `http://localhost:5000/quizzes/${quizId}/custom-question`,
+          {
+            question: q.question,
+            questionImage: q.questionImage,
+            options: q.options,
+            correctAnswer: q.options.includes(q.correctAnswer)
+              ? q.correctAnswer
+              : q.options[0], // default fallback
+            teacherId,
+          }
+        );
+        uploadedCustomIds.push(res.data.question._id);
+      }
+
+      // Merge selectedQuestions (excluding custom temp IDs) + uploaded custom question _ids
+      const realSelected = selectedQuestions.filter((id) => !id.startsWith("custom-"));
+      const finalQuestionIds = [...realSelected, ...uploadedCustomIds];
+
+      // Update quiz with all question IDs
+      await axios.put(`http://localhost:5000/quizzes/${createdQuiz._id}`, {
+        questions: finalQuestionIds,
+      });
+
+      toast({
+        title: "Quiz Created",
+        description: `Quiz "${quizId}" created with ${finalQuestionIds.length} questions.`,
+      });
+
+      setSelectedQuestions([]);
+      setCustomQuestions([]);
+      setQuizId("");
+    } catch (err: any) {
+      console.error(err);
+      toast({
+        title: "Error",
+        description: err.response?.data?.error || "Failed to create quiz",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="p-4">
@@ -134,19 +204,60 @@ export default function CreateQuiz() {
         <Button onClick={handleFilter}>Filter</Button>
       </div>
 
-      {/* New input for quizId */}
-      <div className="mb-4">
-        <input
-          type="text"
-          placeholder="Enter Quiz ID"
-          value={quizId}
-          onChange={(e) => setQuizId(e.target.value)}
-          className="border p-2 rounded w-full"
-        />
-      </div>
+      <input
+        type="text"
+        placeholder="Enter Quiz ID"
+        value={quizId}
+        onChange={(e) => setQuizId(e.target.value)}
+        className="border p-2 rounded w-full mb-4"
+      />
+
+      <Button onClick={() => setShowCustomForm(!showCustomForm)} className="mb-4">
+        {showCustomForm ? "Cancel Custom Question" : "Add Custom Question"}
+      </Button>
+
+      {showCustomForm && (
+        <div className="border p-4 mb-4 bg-gray-50 rounded">
+          <input
+            type="text"
+            name="question"
+            placeholder="Custom Question"
+            value={customForm.question}
+            onChange={handleCustomFormChange}
+            className="w-full border p-2 mb-2 rounded"
+          />
+          <input
+            type="text"
+            name="questionImage"
+            placeholder="Image URL (optional)"
+            value={customForm.questionImage}
+            onChange={handleCustomFormChange}
+            className="w-full border p-2 mb-2 rounded"
+          />
+          {customForm.options.map((opt, i) => (
+            <input
+              key={i}
+              type="text"
+              placeholder={`Option ${i + 1}`}
+              value={opt}
+              onChange={(e) => handleCustomFormChange(e, i)}
+              className="w-full border p-2 mb-2 rounded"
+            />
+          ))}
+          <input
+            type="text"
+            name="correctAnswer"
+            placeholder="Correct Answer"
+            value={customForm.correctAnswer}
+            onChange={handleCustomFormChange}
+            className="w-full border p-2 mb-2 rounded"
+          />
+          <Button onClick={addCustomQuestionLocally}>Add to Quiz</Button>
+        </div>
+      )}
 
       <div className="grid gap-4">
-        {filteredQuestions.map((q) => (
+        {filteredQuestions.concat(customQuestions).map((q) => (
           <div
             key={q._id}
             className={`p-4 border rounded shadow-sm ${
@@ -155,6 +266,17 @@ export default function CreateQuiz() {
             onClick={() => toggleSelect(q._id)}
           >
             <p className="font-semibold">{q.question}</p>
+            {q.questionImage && (
+              <Button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.open(q.questionImage, "_blank");
+                }}
+                className="text-sm mt-1"
+              >
+                View Image
+              </Button>
+            )}
             <ul className="list-disc pl-4">
               {q.options.map((opt, i) => (
                 <li key={i}>{opt}</li>
