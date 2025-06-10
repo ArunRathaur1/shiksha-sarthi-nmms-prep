@@ -17,7 +17,7 @@ export default function LoginStudent() {
     console.log(id);
     console.log(password);
 
-    const url = "http://localhost:5000/students/login";
+    const url = "https://shikshasarthi-vtyt.onrender.com/students/login";
     const payload = {
       studentId: id,
       password: password,

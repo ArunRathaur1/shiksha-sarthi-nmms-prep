@@ -100,7 +100,7 @@ export default function SimpleQuestionForm() {
     setUploading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/questions", {
+      const response = await fetch("https://shikshasarthi-vtyt.onrender.com/questions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),

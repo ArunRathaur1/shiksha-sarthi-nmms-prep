@@ -21,7 +21,7 @@ const SubjectTopics: React.FC = () => {
       setError(null);
 
       try {
-        const studentCookie = Cookies.get("student");
+        const studentCookie = localStorage.getItem("student");
 
         let className: string | null = null;
         if (studentCookie) {
@@ -42,7 +42,7 @@ const SubjectTopics: React.FC = () => {
         }
 
         const res = await axios.get(
-          `http://localhost:5000/questions/topics/${className}/${subject}`
+          `https://shikshasarthi-vtyt.onrender.com/questions/topics/${className}/${subject}`
         );
 
         if (res.data && Array.isArray(res.data.topics)) {

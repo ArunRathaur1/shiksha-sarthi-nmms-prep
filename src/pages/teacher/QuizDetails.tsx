@@ -33,7 +33,7 @@ const QuizDetails = () => {
   useEffect(() => {
     const fetchQuizDetails = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/quizzes/${quizId}`);
+        const response = await fetch(`https://shikshasarthi-vtyt.onrender.com/quizzes/${quizId}`);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
