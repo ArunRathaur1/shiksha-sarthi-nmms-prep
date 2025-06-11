@@ -1,38 +1,39 @@
-import fs from "node:fs";
-import axios from "axios";
-import FormData from "form-data";
-
-async function generateImage() {
+// const fetch = require("node-fetch");
+const questions = [
+  {
+    class: "NMMS",
+    subject: "विज्ञान",
+    topic: "कोशिका",
+    question: "हमारे शरीर की संरचनात्मक और कार्यात्मक इकाई क्या कहलाती है?",
+    options: ["ऊतक", "अंग", "कोशिका", "परमाणु"],
+    correctAnswer: "कोशिका",
+    questionImage:
+      "https://res.cloudinary.com/dmebh0vcd/image/upload/v1749200239/OIP_n9pq2n.webp",
+  }
+];
+async function uploadQuestion(question) {
   try {
-    const form = new FormData();
-    form.append(
-      "prompt",
-      "An eco-friendly reusable bag made of cloth, placed on a natural background with green plants, symbolizing sustainability and environmental care. The bag is sturdy, washable, and ideal for daily shopping. Illustration style, bright and clean"
-    );
-    form.append("output_format", "webp");
+    const response = await fetch("http://localhost:5000/questions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(question),
+    });
 
-    const response = await axios.post(
-      "https://api.stability.ai/v2beta/stable-image/generate/ultra",
-      form,
-      {
-        headers: {
-          ...form.getHeaders(),
-          Authorization: `Bearer sk-KXTDlcVSynVHPvna8wjb4AhuKS5A0ahk99ttwvKrIhDkIe0J`,
-          Accept: "image/*",
-        },
-        responseType: "arraybuffer",
-      }
-    );
-
-    if (response.status === 200) {
-      fs.writeFileSync("./lighthouse.webp", Buffer.from(response.data));
-      console.log("✅ Image saved as lighthouse.webp");
-    } else {
-      throw new Error(`Error ${response.status}: ${response.data.toString()}`);
+    if (!response.ok) {
+      throw new Error(`Failed with status ${response.status}`);
     }
+
+    console.log(`✅ Uploaded: "${question.question}"`);
   } catch (error) {
-    console.error("❌ Failed to generate image:", error.message);
+    console.error(`❌ Error: "${question.question}"`, error);
   }
 }
 
-generateImage();
+async function uploadAllQuestions() {
+  for (const question of questions) {
+    await uploadQuestion(question);
+  }
+  console.log("✅ All questions uploaded!");
+}
+
+uploadAllQuestions();

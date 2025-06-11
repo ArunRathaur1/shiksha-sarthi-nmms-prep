@@ -39,10 +39,11 @@ const PracticeQuiz: React.FC = () => {
     const fetchQuestions = async () => {
       try {
         const studentCookie = localStorage.getItem("student");
+        console.log("hello")
         console.log(studentCookie)
         const parsed = studentCookie ? JSON.parse(studentCookie) : null;
         const className = parsed?.student?.class || parsed?.class || null;
-        const res = await axios.get(`http://localhost:5000/questions/${className}/${subject}/${topic}`);
+        const res = await axios.get(`https://shikshasarthi-vtyt.onrender.com/questions/${className}/${subject}/${topic}`);
         setQuestions(res.data);
         setStartTime(Date.now());
         setQuestionStartTime(Date.now());

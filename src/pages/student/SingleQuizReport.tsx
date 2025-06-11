@@ -49,8 +49,8 @@ const SingleQuizReport: React.FC = () => {
         const studentId = student.student.studentId;
 
         const [studentRes, quizRes] = await Promise.all([
-          axios.get(`http://localhost:5000/students/${studentId}`),
-          axios.get(`http://localhost:5000/quizzes/${id}`),
+          axios.get(`https://shikshasarthi-vtyt.onrender.com/students/${studentId}`),
+          axios.get(`https://shikshasarthi-vtyt.onrender.com/quizzes/${id}`),
         ]);
 
         const studentData = studentRes.data;

@@ -41,7 +41,7 @@ export default function CreateQuiz() {
       setTeacherId(parsed.teacher.teacherId);
 
       axios
-        .get("http://localhost:5000/questions/")
+        .get("https://shikshasarthi-vtyt.onrender.com/questions/")
         .then((res) => {
           const teacherQuestions = res.data.filter(
             (q: any) => !q.teacherId || q.teacherId === parsed.teacher.teacherId
@@ -129,7 +129,7 @@ export default function CreateQuiz() {
 
     try {
       // First, create the quiz without questions
-      const quizRes = await axios.post("http://localhost:5000/quizzes/", {
+      const quizRes = await axios.post("https://shikshasarthi-vtyt.onrender.com/quizzes/", {
         teacherId,
         quizId: quizId.trim(),
         questions: [],
@@ -141,7 +141,7 @@ export default function CreateQuiz() {
       const uploadedCustomIds = [];
       for (let q of customQuestions) {
         const res = await axios.post(
-          `http://localhost:5000/quizzes/${quizId}/custom-question`,
+          `https://shikshasarthi-vtyt.onrender.com/quizzes/${quizId}/custom-question`,
           {
             question: q.question,
             questionImage: q.questionImage,
@@ -160,7 +160,7 @@ export default function CreateQuiz() {
       const finalQuestionIds = [...realSelected, ...uploadedCustomIds];
 
       // Update quiz with all question IDs
-      await axios.put(`http://localhost:5000/quizzes/${createdQuiz._id}`, {
+      await axios.put(`https://shikshasarthi-vtyt.onrender.com/quizzes/${createdQuiz._id}`, {
         questions: finalQuestionIds,
       });
 
