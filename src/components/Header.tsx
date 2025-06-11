@@ -49,6 +49,9 @@ const Header: React.FC = () => {
               <Link to="/register">
                 <Button size="sm">Register</Button>
               </Link>
+              <Link to="/uploadquestion">
+                <Button size="sm">upload question</Button>
+              </Link>
             </div>
           )}
         </div>
