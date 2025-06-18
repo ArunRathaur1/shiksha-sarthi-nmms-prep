@@ -48,7 +48,7 @@ const StudentDashboard: React.FC = () => {
 
         if (studentId) {
           axios
-            .get(`https://shikshasarthi-vtyt.onrender.com/students/${studentId}`)
+            .get(`http://localhost:5000/students/${studentId}`)
             .then((res) => {
               setStudent(res.data);
             })
