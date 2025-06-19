@@ -71,7 +71,7 @@ export default function AddMyQuestion() {
       };
 
       const response = await axios.post(
-       "https://shikshasarthi-vtyt.onrender.com/questions/teacher",
+       "http://localhost:5000/questions/teacher",
         payload
       );
 

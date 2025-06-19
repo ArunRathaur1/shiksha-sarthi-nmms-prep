@@ -8,7 +8,7 @@ import { Clock, CheckCircle, XCircle, AlertCircle, Trophy, Target, Timer, BarCha
 interface Question {
   _id: string;
   question: string;
-  questionImage?: string; // Added question image support
+  questionImage?: string; 
   options: string[];
   correctAnswer: string;
   hint?: {
@@ -22,6 +22,7 @@ const PracticeQuiz: React.FC = () => {
   const { subject, topic } = useParams<{ subject: string; topic: string }>();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [current, setCurrent] = useState(0);
+  const[className, setClassName] = useState<string | null>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [answers, setAnswers] = useState<
     { questionId: string; selected: string; isCorrect: boolean }[]
@@ -39,11 +40,10 @@ const PracticeQuiz: React.FC = () => {
     const fetchQuestions = async () => {
       try {
         const studentCookie = localStorage.getItem("student");
-        console.log("hello")
-        console.log(studentCookie)
         const parsed = studentCookie ? JSON.parse(studentCookie) : null;
         const className = parsed?.student?.class || parsed?.class || null;
-        const res = await axios.get(`https://shikshasarthi-vtyt.onrender.com/questions/${className}/${subject}/${topic}`);
+        setClassName(className);
+        const res = await axios.get(`http://localhost:5000/questions/${className}/${subject}/${topic}`);
         setQuestions(res.data);
         setStartTime(Date.now());
         setQuestionStartTime(Date.now());
@@ -130,53 +130,72 @@ const PracticeQuiz: React.FC = () => {
   };
 
   // Helper function to render hint content
-  const renderHintContent = (hint: Question['hint']) => {
-    if (!hint) return null;
+  const renderHintContent = (
+    hint: Question["hint"],
+  ) => {
+
+    // Prepare local image path if image exists
+    let localImagePath: string | null = null;
+    if (hint.image && hint.image.trim()) {
+      const imageName = hint.image.split("/").pop();
+      localImagePath = `/images/${className}/${subject}/${topic}/${imageName}`;
+    }
 
     return (
       <div className="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-lg">
         <div className="flex items-start gap-2">
-          <Lightbulb className="text-amber-600 mt-0.5 flex-shrink-0" size={18} />
+          <Lightbulb
+            className="text-amber-600 mt-0.5 flex-shrink-0"
+            size={18}
+          />
           <div className="flex-1">
             <p className="font-medium text-amber-800 mb-2">Hint:</p>
-            
+
             {/* Text Hint */}
             {hint.text && hint.text.trim() && (
               <div className="mb-3">
                 <p className="text-amber-700">{hint.text}</p>
               </div>
             )}
-            
-            {/* Image Hint - As Clickable Link */}
-            {hint.image && hint.image.trim() && (
+
+            {/* Image Hint - Render Locally */}
+            {localImagePath && (
               <div className="mb-3">
                 <div className="flex items-center gap-2 mb-2">
                   <Image className="text-amber-600" size={16} />
-                  <span className="text-sm font-medium text-amber-800">Image Hint:</span>
+                  <span className="text-sm font-medium text-amber-800">
+                    Image Hint:
+                  </span>
                 </div>
-                <a 
-                  href={hint.image} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-3 py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-lg transition-colors duration-200 border border-amber-300 hover:border-amber-400"
-                >
-                  <Image size={16} />
-                  <span className="font-medium">View Image Hint</span>
-                  <ExternalLink size={14} />
-                </a>
+                <div className="border border-amber-300 rounded-lg p-2 bg-amber-100">
+                  <img
+                    src={localImagePath}
+                    alt="Hint"
+                    className="max-w-full max-h-60 w-auto h-auto object-contain rounded-md"
+                    style={{ maxWidth: "400px", maxHeight: "240px" }}
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                      const parent =
+                        e.currentTarget.parentElement?.parentElement;
+                      if (parent) parent.style.display = "none";
+                    }}
+                  />
+                </div>
               </div>
             )}
-            
-            {/* Video Hint - As Clickable Link */}
+
+            {/* Video Hint - Still using external URL */}
             {hint.video && hint.video.trim() && (
               <div className="mb-3">
                 <div className="flex items-center gap-2 mb-2">
                   <Video className="text-amber-600" size={16} />
-                  <span className="text-sm font-medium text-amber-800">Video Hint:</span>
+                  <span className="text-sm font-medium text-amber-800">
+                    Video Hint:
+                  </span>
                 </div>
-                <a 
-                  href={hint.video} 
-                  target="_blank" 
+                <a
+                  href={hint.video}
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-3 py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-lg transition-colors duration-200 border border-amber-300 hover:border-amber-400"
                 >
@@ -191,28 +210,33 @@ const PracticeQuiz: React.FC = () => {
       </div>
     );
   };
+  
 
   // Helper function to render question image with fixed size
-  const renderQuestionImage = (questionImage?: string) => {
-    if (!questionImage || !questionImage.trim()) return null;
-
+  const renderQuestionImage = (
+    questionImage?: string,
+  ) => {
+    const imageName = questionImage.split("/").pop();
+    const localImagePath = `/images/${className}/${subject}/${topic}/${imageName}`;
     return (
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-3">
           <Image className="text-blue-600" size={18} />
-          <span className="text-sm font-medium text-gray-700">Question Image:</span>
+          <span className="text-sm font-medium text-gray-700">
+            Question Image:
+          </span>
         </div>
         <div className="border-2 border-gray-200 rounded-lg p-3 bg-gray-50">
           <div className="flex justify-center">
-            <img 
-              src={questionImage} 
-              alt="Question" 
+            <img
+              src={localImagePath}
+              alt="Question"
               className="max-w-full max-h-80 w-auto h-auto object-contain rounded-lg shadow-sm"
-              style={{ maxWidth: '500px', maxHeight: '320px' }}
+              style={{ maxWidth: "500px", maxHeight: "320px" }}
               onError={(e) => {
-                e.currentTarget.style.display = 'none';
+                e.currentTarget.style.display = "none";
                 const parent = e.currentTarget.parentElement?.parentElement;
-                if (parent) parent.style.display = 'none';
+                if (parent) parent.style.display = "none";
               }}
             />
           </div>
@@ -220,7 +244,7 @@ const PracticeQuiz: React.FC = () => {
       </div>
     );
   };
-
+  
   if (loading) return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
       <div className="text-center">

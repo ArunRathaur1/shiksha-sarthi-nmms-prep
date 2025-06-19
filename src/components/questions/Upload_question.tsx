@@ -4,7 +4,7 @@ export default function SimpleQuestionForm() {
   const initialFormState = {
     subject: "विज्ञान",
     class: "NMMS",
-    topic: "",
+    topic: "सूक्ष्मजीव",
     question: "",
     options: ["", "", "", ""],
     correctAnswer: "",
@@ -100,7 +100,7 @@ export default function SimpleQuestionForm() {
     setUploading(true);
 
     try {
-      const response = await fetch("https://shikshasarthi-vtyt.onrender.com/questions", {
+      const response = await fetch("http://localhost:5000/questions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),

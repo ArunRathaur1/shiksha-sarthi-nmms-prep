@@ -56,7 +56,7 @@ const TeacherDashboard: React.FC = () => {
           throw new Error('Teacher ID not found in cookie');
         }
 
-        const response = await fetch(`https://shikshasarthi-vtyt.onrender.com/teachers/${teacherIdFromCookie}/quizzes`);
+        const response = await fetch(`http://localhost:5000/teachers/${teacherIdFromCookie}/quizzes`);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);

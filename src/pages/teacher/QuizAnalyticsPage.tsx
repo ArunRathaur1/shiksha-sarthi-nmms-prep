@@ -24,8 +24,8 @@
 //     const fetchData = async () => {
 //       try {
 //         const [studentRes, quizRes] = await Promise.all([
-//           axios.get(`https://shikshasarthi-vtyt.onrender.com/reports/student-quiz/${quizId}`),
-//           axios.get(`https://shikshasarthi-vtyt.onrender.com/reports/quiz/${quizId}`)
+//           axios.get(`http://localhost:5000/reports/student-quiz/${quizId}`),
+//           axios.get(`http://localhost:5000/reports/quiz/${quizId}`)
 //         ]);
 
 //         setStudentReports(studentRes.data);
@@ -150,8 +150,8 @@
 //       try {
 //         setLoading(true);
 //         const [studentRes, quizRes] = await Promise.all([
-//           axios.get(`https://shikshasarthi-vtyt.onrender.com/reports/student-quiz/${quizId}`),
-//           axios.get(`https://shikshasarthi-vtyt.onrender.com/reports/quiz/${quizId}`)
+//           axios.get(`http://localhost:5000/reports/student-quiz/${quizId}`),
+//           axios.get(`http://localhost:5000/reports/quiz/${quizId}`)
 //         ]);
 
 //         setStudentReports(studentRes.data);
@@ -528,8 +528,8 @@
 //       try {
 //         setLoading(true);
 //         const [studentRes, quizRes] = await Promise.all([
-//           axios.get(`https://shikshasarthi-vtyt.onrender.com/reports/student-quiz/${quizId}`),
-//           axios.get(`https://shikshasarthi-vtyt.onrender.com/reports/quiz/${quizId}`)
+//           axios.get(`http://localhost:5000/reports/student-quiz/${quizId}`),
+//           axios.get(`http://localhost:5000/reports/quiz/${quizId}`)
 //         ]);
 
 //         setStudentReports(studentRes.data);
@@ -914,8 +914,8 @@ export default function QuizAnalyticsPage() {
       try {
         setLoading(true);
         const [studentRes, quizRes] = await Promise.all([
-          axios.get(`https://shikshasarthi-vtyt.onrender.com/reports/student-quiz/${quizId}`),
-          axios.get(`https://shikshasarthi-vtyt.onrender.com/reports/quiz/${quizId}`)
+          axios.get(`http://localhost:5000/reports/student-quiz/${quizId}`),
+          axios.get(`http://localhost:5000/reports/quiz/${quizId}`)
         ]);
 
         const studentReportsData = studentRes.data;
@@ -926,7 +926,7 @@ export default function QuizAnalyticsPage() {
         const uniqueStudentIds = [...new Set(studentReportsData.map(report => report.studentId))];
         const namePromises = uniqueStudentIds.map(async (studentId) => {
           try {
-            const response = await axios.get(`https://shikshasarthi-vtyt.onrender.com/students/${studentId}`);
+            const response = await axios.get(`http://localhost:5000/students/${studentId}`);
             return { studentId, name: response.data.name || response.data.fullName || 'Unknown' };
           } catch (error) {
             console.error(`Error fetching student ${studentId}:`, error);

@@ -42,7 +42,7 @@ const SubjectTopics: React.FC = () => {
         }
 
         const res = await axios.get(
-          `https://shikshasarthi-vtyt.onrender.com/questions/topics/${className}/${subject}`
+          `http://localhost:5000/questions/topics/${className}/${subject}`
         );
 
         if (res.data && Array.isArray(res.data.topics)) {

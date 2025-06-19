@@ -41,8 +41,8 @@ const Login: React.FC = () => {
 
       const url =
         role === "student"
-          ? "https://shikshasarthi-vtyt.onrender.com/students/login"
-          : "https://shikshasarthi-vtyt.onrender.com/teachers/login";
+          ? "http://localhost:5000/students/login"
+          : "http://localhost:5000/teachers/login";
 
       const payload =
         role === "student"
