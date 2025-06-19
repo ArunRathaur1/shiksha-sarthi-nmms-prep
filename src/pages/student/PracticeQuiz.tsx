@@ -42,7 +42,6 @@ const PracticeQuiz: React.FC = () => {
         const studentCookie = localStorage.getItem("student");
         const parsed = studentCookie ? JSON.parse(studentCookie) : null;
         const className = parsed?.student?.class || parsed?.class || null;
-        setClassName(className);
         const res = await axios.get(`http://localhost:5000/questions/${className}/${subject}/${topic}`);
         setQuestions(res.data);
         setStartTime(Date.now());
