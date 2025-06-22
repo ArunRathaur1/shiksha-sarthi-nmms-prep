@@ -231,7 +231,7 @@ const StudentDashboard: React.FC = () => {
           </div>
 
           {/* Progress Section */}
-          <div className="mb-12">
+          {/* <div className="mb-12">
             <h2 className="text-2xl font-bold mb-4">Your Progress</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {subjectProgress.map((subject, index) => (
@@ -263,7 +263,7 @@ const StudentDashboard: React.FC = () => {
                 </Card>
               ))}
             </div>
-          </div>
+          </div> */}
 
           {/* Real Recent Activity */}
           <div>
