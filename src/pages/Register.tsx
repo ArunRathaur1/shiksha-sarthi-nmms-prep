@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/components/ui/use-toast';
 import {
   Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle,
 } from '@/components/ui/card';
@@ -12,11 +12,16 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
-import { useToast } from '@/components/ui/use-toast';
 import { BookOpen } from 'lucide-react';
 import axios from 'axios';
 
 const Register: React.FC = () => {
+  const [isAdminVerified, setIsAdminVerified] = useState(false);
+  const [adminUsername, setAdminUsername] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
+  const { toast } = useToast();
+
+  // Registration state
   const [role, setRole] = useState<'student' | 'teacher'>('student');
   const [name, setName] = useState('');
   const [id, setId] = useState('');
@@ -27,10 +32,20 @@ const Register: React.FC = () => {
   const [classLevel, setClassLevel] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const navigate = useNavigate();
-  const { toast } = useToast();
+  const handleAdminLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (adminUsername === 'admin' && adminPassword === 'admin') {
+      setIsAdminVerified(true);
+    } else {
+      toast({
+        title: 'Access Denied',
+        description: 'Invalid admin credentials',
+        variant: 'destructive',
+      });
+    }
+  };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!id || !name || !phone || !password || !instituteId || (role === 'student' && !classLevel)) {
@@ -103,185 +118,134 @@ const Register: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
       <Card className="w-full max-w-md mx-auto">
-        <CardHeader className="space-y-1 flex flex-col items-center">
-          <div className="flex items-center justify-center p-2 bg-primary/10 rounded-full mb-2">
-            <BookOpen className="h-10 w-10 text-edu-blue" />
-          </div>
-          <CardTitle className="text-2xl text-center">Create an account</CardTitle>
-          <CardDescription className="text-center">
-            Register to start preparing for NMMS exam
-          </CardDescription>
-        </CardHeader>
-
-        <form onSubmit={handleSubmit}>
-          <Tabs defaultValue="student" className="w-full" onValueChange={(value) => setRole(value as 'student' | 'teacher')}>
-            <TabsList className="grid w-full grid-cols-2 mb-4">
-              <TabsTrigger value="student">Student</TabsTrigger>
-              <TabsTrigger value="teacher">Teacher</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="student">
+        {!isAdminVerified ? (
+          <>
+            <CardHeader className="space-y-1 flex flex-col items-center">
+              <div className="flex items-center justify-center p-2 bg-primary/10 rounded-full mb-2">
+                <BookOpen className="h-10 w-10 text-edu-blue" />
+              </div>
+              <CardTitle className="text-2xl text-center">Admin Access Required</CardTitle>
+              <CardDescription className="text-center">
+                Please enter admin credentials to proceed
+              </CardDescription>
+            </CardHeader>
+            <form onSubmit={handleAdminLogin}>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label>Student ID</Label>
+                  <Label>Username</Label>
                   <Input
-                    placeholder="e.g., STD1001"
-                    value={id}
-                    onChange={(e) => setId(e.target.value)}
+                    placeholder="Enter username"
+                    value={adminUsername}
+                    onChange={(e) => setAdminUsername(e.target.value)}
                     required
                   />
                 </div>
-
-                <div className="space-y-2">
-                  <Label>Full Name</Label>
-                  <Input
-                    placeholder="Your Name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Phone</Label>
-                  <Input
-                    type="tel"
-                    placeholder="10-digit number"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Institute ID</Label>
-                  <Input
-                    placeholder="e.g., INST001"
-                    value={instituteId}
-                    onChange={(e) => setInstituteId(e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Class</Label>
-                  <Select value={classLevel} onValueChange={setClassLevel}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Class" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="6">Class 6</SelectItem>
-                      <SelectItem value="7">Class 7</SelectItem>
-                      <SelectItem value="8">Class 8</SelectItem>
-                      <SelectItem value="NMMS">NMMS</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
                 <div className="space-y-2">
                   <Label>Password</Label>
                   <Input
                     type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Confirm Password</Label>
-                  <Input
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Enter password"
+                    value={adminPassword}
+                    onChange={(e) => setAdminPassword(e.target.value)}
                     required
                   />
                 </div>
               </CardContent>
-            </TabsContent>
+              <CardFooter className="flex flex-col">
+                <Button className="w-full" type="submit">Enter</Button>
+              </CardFooter>
+            </form>
+          </>
+        ) : (
+          <>
+            <CardHeader className="space-y-1 flex flex-col items-center">
+              <div className="flex items-center justify-center p-2 bg-primary/10 rounded-full mb-2">
+                <BookOpen className="h-10 w-10 text-edu-blue" />
+              </div>
+              <CardTitle className="text-2xl text-center">Create an account</CardTitle>
+              <CardDescription className="text-center">
+                Register to start preparing for NMMS exam
+              </CardDescription>
+            </CardHeader>
 
-            <TabsContent value="teacher">
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Teacher ID</Label>
-                  <Input
-                    placeholder="e.g., TCH1001"
-                    value={id}
-                    onChange={(e) => setId(e.target.value)}
-                    required
-                  />
-                </div>
+            <form onSubmit={handleRegisterSubmit}>
+              <Tabs defaultValue="student" className="w-full" onValueChange={(value) => setRole(value as 'student' | 'teacher')}>
+                <TabsList className="grid w-full grid-cols-2 mb-4">
+                  <TabsTrigger value="student">Student</TabsTrigger>
+                  <TabsTrigger value="teacher">Teacher</TabsTrigger>
+                </TabsList>
 
-                <div className="space-y-2">
-                  <Label>Full Name</Label>
-                  <Input
-                    placeholder="Your Name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                  />
-                </div>
+                <TabsContent value="student">
+                  <CardContent className="space-y-4">
+                    <InputBlock label="Student ID" value={id} setValue={setId} />
+                    <InputBlock label="Full Name" value={name} setValue={setName} />
+                    <InputBlock label="Phone" value={phone} setValue={setPhone} type="tel" />
+                    <InputBlock label="Institute ID" value={instituteId} setValue={setInstituteId} />
+                    <div className="space-y-2">
+                      <Label>Class</Label>
+                      <Select value={classLevel} onValueChange={setClassLevel}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Class" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="6">Class 6</SelectItem>
+                          <SelectItem value="7">Class 7</SelectItem>
+                          <SelectItem value="8">Class 8</SelectItem>
+                          <SelectItem value="NMMS">NMMS</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <InputBlock label="Password" value={password} setValue={setPassword} type="password" />
+                    <InputBlock label="Confirm Password" value={confirmPassword} setValue={setConfirmPassword} type="password" />
+                  </CardContent>
+                </TabsContent>
 
-                <div className="space-y-2">
-                  <Label>Phone</Label>
-                  <Input
-                    type="tel"
-                    placeholder="10-digit number"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    required
-                  />
-                </div>
+                <TabsContent value="teacher">
+                  <CardContent className="space-y-4">
+                    <InputBlock label="Teacher ID" value={id} setValue={setId} />
+                    <InputBlock label="Full Name" value={name} setValue={setName} />
+                    <InputBlock label="Phone" value={phone} setValue={setPhone} type="tel" />
+                    <InputBlock label="Institute ID" value={instituteId} setValue={setInstituteId} />
+                    <InputBlock label="Password" value={password} setValue={setPassword} type="password" />
+                    <InputBlock label="Confirm Password" value={confirmPassword} setValue={setConfirmPassword} type="password" />
+                  </CardContent>
+                </TabsContent>
+              </Tabs>
 
-                <div className="space-y-2">
-                  <Label>Institute ID</Label>
-                  <Input
-                    placeholder="e.g., INST001"
-                    value={instituteId}
-                    onChange={(e) => setInstituteId(e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Password</Label>
-                  <Input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Confirm Password</Label>
-                  <Input
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                  />
-                </div>
-              </CardContent>
-            </TabsContent>
-          </Tabs>
-
-          <CardFooter className="flex flex-col">
-            <Button className="w-full" type="submit" disabled={isLoading}>
-              {isLoading ? 'Registering...' : 'Register'}
-            </Button>
-
-            <p className="mt-4 text-center text-sm text-gray-500">
-              Already have an account?{' '}
-              <a href="/login" className="text-edu-blue hover:underline">
-                Login here
-              </a>
-            </p>
-          </CardFooter>
-        </form>
+              <CardFooter className="flex flex-col">
+                <Button className="w-full" type="submit" disabled={isLoading}>
+                  {isLoading ? 'Registering...' : 'Register'}
+                </Button>
+              </CardFooter>
+            </form>
+          </>
+        )}
       </Card>
     </div>
   );
 };
+
+const InputBlock = ({
+  label,
+  value,
+  setValue,
+  type = 'text',
+}: {
+  label: string;
+  value: string;
+  setValue: (val: string) => void;
+  type?: string;
+}) => (
+  <div className="space-y-2">
+    <Label>{label}</Label>
+    <Input
+      type={type}
+      placeholder={label}
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+      required
+    />
+  </div>
+);
 
 export default Register;
