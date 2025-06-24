@@ -49,6 +49,7 @@ const TeacherDashboard: React.FC = () => {
         setTeacherData(teacherInfo);
         
         console.log('Teacher data from cookie:', teacherInfo); // Debug log
+        console.log(teacherInfo);
 
         const teacherIdFromCookie = teacherInfo.teacherId || teacherInfo.id;
         
@@ -203,7 +204,7 @@ const TeacherDashboard: React.FC = () => {
           </div>
           
           {/* Subject Stats */}
-          <div className="mb-12">
+          {/* <div className="mb-12">
             <h2 className="text-2xl font-bold mb-4">Subject Performance</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -234,7 +235,7 @@ const TeacherDashboard: React.FC = () => {
                 </Card>
               ))}
             </div>
-          </div>
+          </div> */}
           
           {/* Recent Quizzes */}
           <div>
