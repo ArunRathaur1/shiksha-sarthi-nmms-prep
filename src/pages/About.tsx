@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -9,7 +8,7 @@ const About: React.FC = () => {
   const sections = [
     {
       title: "What is NMMS?",
-      icon: <BookOpen className="h-10 w-10 text-edu-blue mb-4" />,
+      icon: <BookOpen className="h-8 w-8 sm:h-10 sm:w-10 text-edu-blue mb-4" />,
       content: `
         The National Means-cum-Merit Scholarship (NMMS) is a Central Sector Scheme that provides scholarships to 
         meritorious students from economically weaker sections to reduce dropout rates in class VIII and encourage 
@@ -18,7 +17,7 @@ const About: React.FC = () => {
     },
     {
       title: "Eligibility Criteria",
-      icon: <Award className="h-10 w-10 text-edu-purple mb-4" />,
+      icon: <Award className="h-8 w-8 sm:h-10 sm:w-10 text-edu-purple mb-4" />,
       content: `
         • Students must be studying in Class VIII in a government, local body, or government-aided school.
         • Parental income should not exceed ₹3,50,000 per annum.
@@ -28,7 +27,7 @@ const About: React.FC = () => {
     },
     {
       title: "Exam Pattern",
-      icon: <BookText className="h-10 w-10 text-edu-green mb-4" />,
+      icon: <BookText className="h-8 w-8 sm:h-10 sm:w-10 text-edu-green mb-4" />,
       content: `
         The NMMS exam consists of two parts:
         
@@ -47,7 +46,7 @@ const About: React.FC = () => {
     },
     {
       title: "Scholarship Benefits",
-      icon: <GraduationCap className="h-10 w-10 text-edu-yellow mb-4" />,
+      icon: <GraduationCap className="h-8 w-8 sm:h-10 sm:w-10 text-edu-yellow mb-4" />,
       content: `
         • Scholarship amount: ₹12,000 per annum (₹1,000 per month)
         • Duration: 4 years (from Classes IX to XII)
@@ -62,36 +61,41 @@ const About: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      
-      <main className="flex-1 py-12 bg-gray-50">
-        <div className="edu-container">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold mb-4">About NMMS Examination</h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+
+      <main className="flex-1 py-10 bg-gray-50 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto">
+          {/* Heading */}
+          <div className="text-center mb-10 px-2">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
+              About NMMS Examination
+            </h1>
+            <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto">
               Learn more about the National Means-cum-Merit Scholarship scheme and how it helps talented students from economically weaker sections.
             </p>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+
+          {/* Sections */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 mb-12">
             {sections.map((section, index) => (
               <Card key={index} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-6 flex flex-col items-center">
-                  <div className="flex flex-col items-center text-center mb-4">
-                    {section.icon}
-                    <h2 className="text-2xl font-bold mb-4">{section.title}</h2>
-                  </div>
-                  <div className="whitespace-pre-line">
+                <CardContent className="p-6 sm:p-8 flex flex-col items-center text-center">
+                  {section.icon}
+                  <h2 className="text-lg sm:text-xl font-semibold mb-3">{section.title}</h2>
+                  <p className="text-sm sm:text-base whitespace-pre-line text-gray-700">
                     {section.content}
-                  </div>
+                  </p>
                 </CardContent>
               </Card>
             ))}
           </div>
-          
+
+          {/* FAQs */}
           <Card className="mb-12">
-            <CardContent className="p-8">
-              <h2 className="text-2xl font-bold mb-6">Frequently Asked Questions</h2>
-              <div className="space-y-6">
+            <CardContent className="p-6 sm:p-8">
+              <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center sm:text-left">
+                Frequently Asked Questions
+              </h2>
+              <div className="space-y-6 text-sm sm:text-base">
                 {[
                   {
                     q: "When is the NMMS exam conducted?",
@@ -115,7 +119,7 @@ const About: React.FC = () => {
                   }
                 ].map((faq, idx) => (
                   <div key={idx}>
-                    <h3 className="font-bold text-lg">{faq.q}</h3>
+                    <h3 className="font-semibold text-gray-800">{faq.q}</h3>
                     <p className="mt-1 text-gray-700">{faq.a}</p>
                   </div>
                 ))}
@@ -124,7 +128,7 @@ const About: React.FC = () => {
           </Card>
         </div>
       </main>
-      
+
       <Footer />
     </div>
   );

@@ -26,7 +26,6 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!id || !password) {
       toast({
         title: "Error",
@@ -52,25 +51,20 @@ const Login: React.FC = () => {
       const response = await axios.post(url, payload);
 
       if (role === "teacher") {
-        // ✅ Store teacher data in cookie
         Cookies.set("teacher", JSON.stringify(response.data), {
           expires: 7,
           secure: true,
           sameSite: "strict",
         });
       } else {
-        // ✅ Store student data in localStorage
         localStorage.setItem("student", JSON.stringify(response.data));
       }
 
       toast({
         title: "Success",
-        description: `${
-          role === "student" ? "Student" : "Teacher"
-        } login successful`,
+        description: `${role === "student" ? "Student" : "Teacher"} login successful`,
       });
 
-      // ✅ Redirect
       navigate(role === "student" ? "/student" : "/teacher");
     } catch (error: any) {
       toast({
@@ -82,17 +76,16 @@ const Login: React.FC = () => {
       setIsLoading(false);
     }
   };
-  
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
-      <Card className="w-full max-w-md mx-auto">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 sm:px-6 md:px-8 py-10">
+      <Card className="w-full max-w-md sm:max-w-sm md:max-w-md mx-auto shadow-md">
         <CardHeader className="space-y-1 flex flex-col items-center">
-          <div className="flex items-center justify-center p-2 bg-primary/10 rounded-full mb-2">
-            <BookOpen className="h-10 w-10 text-edu-blue" />
+          <div className="flex items-center justify-center p-3 bg-primary/10 rounded-full mb-2">
+            <BookOpen className="h-8 w-8 text-edu-blue sm:h-10 sm:w-10" />
           </div>
-          <CardTitle className="text-2xl text-center">Login</CardTitle>
-          <CardDescription className="text-center">
+          <CardTitle className="text-xl sm:text-2xl text-center">Login</CardTitle>
+          <CardDescription className="text-sm sm:text-base text-center">
             Login to access NMMS preparation resources
           </CardDescription>
         </CardHeader>
@@ -103,30 +96,26 @@ const Login: React.FC = () => {
               <select
                 id="role"
                 value={role}
-                onChange={(e) =>
-                  setRole(e.target.value as "student" | "teacher")
-                }
-                className="w-full border rounded px-3 py-2 text-sm"
+                onChange={(e) => setRole(e.target.value as "student" | "teacher")}
+                className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring focus:border-edu-blue"
               >
                 <option value="student">Student</option>
                 <option value="teacher">Teacher</option>
               </select>
             </div>
+
             <div className="space-y-2">
-              <Label htmlFor="id">
-                {role === "student" ? "Student ID" : "Teacher ID"}
-              </Label>
+              <Label htmlFor="id">{role === "student" ? "Student ID" : "Teacher ID"}</Label>
               <Input
                 id="id"
                 type="text"
-                placeholder={`Enter your ${
-                  role === "student" ? "Student" : "Teacher"
-                } ID`}
+                placeholder={`Enter your ${role === "student" ? "Student" : "Teacher"} ID`}
                 value={id}
                 onChange={(e) => setId(e.target.value)}
                 required
               />
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
@@ -138,18 +127,20 @@ const Login: React.FC = () => {
                 required
               />
             </div>
-            <div>
-              <p className="text-xs text-gray-500">Demo credentials:</p>
-              <p className="text-xs text-gray-500">ID: 1001</p>
-              <p className="text-xs text-gray-500">Password: 1234</p>
+
+            <div className="text-xs text-gray-500 space-y-0.5">
+              <p>Demo credentials:</p>
+              <p>ID: 1001</p>
+              <p>Password: 1234</p>
             </div>
           </CardContent>
-          <CardFooter className="flex flex-col">
-            <Button className="w-full" type="submit" disabled={isLoading}>
+
+          <CardFooter className="flex flex-col space-y-2">
+            <Button className="w-full text-sm sm:text-base" type="submit" disabled={isLoading}>
               {isLoading ? "Logging in..." : "Login"}
             </Button>
-            <p className="mt-4 text-center text-sm text-gray-500">
-              Don't have an account?{" "}
+            <p className="mt-2 text-center text-xs sm:text-sm text-gray-500">
+              Don&apos;t have an account?{" "}
               <a href="/register" className="text-edu-blue hover:underline">
                 Register here
               </a>
