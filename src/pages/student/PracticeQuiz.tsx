@@ -228,7 +228,7 @@ const PracticeQuiz: React.FC = () => {
         <div className="border-2 border-gray-200 rounded-lg p-3 bg-gray-50">
           <div className="flex justify-center">
             <img
-              src={localImagePath}
+              src={questionImage}
               alt="Question"
               className="max-w-full max-h-80 w-auto h-auto object-contain rounded-lg shadow-sm"
               style={{ maxWidth: "500px", maxHeight: "320px" }}

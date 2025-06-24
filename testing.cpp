@@ -1,24 +1,21 @@
 #include<bits/stdc++.h>
 using namespace std;
 void solve(){
-    int w,h,a,b;
-    int x1,y1,x2,y2;
-    cin>>w>>h>>a>>b;
-    cin>>x1>>y1>>x2>>y2;
-    if(x1>x2){
-        swap(x1,x2);
+   int k;
+   cin>>k;
+    if(k>=0&&k<=9){
+        cout<<k<<endl;
     }
-    int c1=x1+a-x2;
-    if(y1>y2){
-        swap(y1,y2);
+    else if(k>=10&& k<99){
+        k=k-9;
+        int p=k/2;
+        if(p*2==k){
+            cout<<(p+9)%10<<endl;
+        }
+        else{
+            cout<<(p+9)/10<<endl;
+        }
     }
-    int c2=y1+b-y2;
-    if(c1%a==0||c2%b==0){
-        cout<<"YES"<<endl;
-    }
-    else{
-        cout<<"NO"<<endl;
-    } 
 }
 int main()
 {
