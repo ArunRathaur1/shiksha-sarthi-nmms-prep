@@ -1,9 +1,8 @@
+import axios from 'axios';
+import { AlertCircle, BarChart3, CheckCircle, Clock, ExternalLink, Image, Lightbulb, SkipForward, Target, Timer, Trophy, Video, XCircle } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
-import Cookies from 'js-cookie';
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-import { Clock, CheckCircle, XCircle, AlertCircle, Trophy, Target, Timer, BarChart3, Lightbulb, SkipForward, Image, Video, ExternalLink } from 'lucide-react';
+import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 
 interface Question {
   _id: string;
