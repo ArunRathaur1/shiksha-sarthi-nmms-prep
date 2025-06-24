@@ -42,7 +42,7 @@ const SubjectTopics: React.FC = () => {
         }
 
         const res = await axios.get(
-          `http://localhost:5000/questions/topics/${className}/${subject}`
+          `https://shiksha-sarthi-nmms-prep-cn64.vercel.app/questions/topics/${className}/${subject}`
         );
 
         if (res.data && Array.isArray(res.data.topics)) {

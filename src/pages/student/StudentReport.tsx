@@ -15,7 +15,7 @@ export default function StudentReport() {
         setError(null);
 
         // Fetch student data
-        const resStudent = await fetch(`http://localhost:5000/students/${id}`);
+        const resStudent = await fetch(`https://shiksha-sarthi-nmms-prep-cn64.vercel.app/students/${id}`);
         if (!resStudent.ok) throw new Error("Failed to fetch student data");
         const studentData = await resStudent.json();
         setStudent(studentData);
@@ -30,7 +30,7 @@ export default function StudentReport() {
 
         // Fetch all questions in parallel
         const questionPromises = uniqueQuestionIds.map((qid) =>
-          fetch(`http://localhost:5000/questions/${qid}`).then((res) => {
+          fetch(`https://shiksha-sarthi-nmms-prep-cn64.vercel.app/questions/${qid}`).then((res) => {
             if (!res.ok) throw new Error(`Failed to fetch question ${qid}`);
             return res.json();
           })
