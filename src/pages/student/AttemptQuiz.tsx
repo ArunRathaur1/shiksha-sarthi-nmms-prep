@@ -46,7 +46,7 @@ const AttemptQuiz: React.FC = () => {
   useEffect(() => {
     const fetchQuiz = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/quizzes/${id}`);
+        const res = await axios.get(`https://shiksha-sarthi-nmms-prep-cn64.vercel.app/quizzes/${id}`);
         setQuiz(res.data);
       } catch (err) {
         console.error("Failed to fetch quiz:", err);
@@ -96,11 +96,11 @@ const AttemptQuiz: React.FC = () => {
 
     try {
       const attemptResponse = await axios.patch(
-        `http://localhost:5000/students/${student.studentId}/attempt-quiz`,
+        `https://shiksha-sarthi-nmms-prep-cn64.vercel.app/students/${student.studentId}/attempt-quiz`,
         quizAttemptPayload
       );
 
-      await axios.post(`http://localhost:5000/reports/submit-report`, reportPayload);
+      await axios.post(`https://shiksha-sarthi-nmms-prep-cn64.vercel.app/reports/submit-report`, reportPayload);
 
       Cookies.set("quizResult", JSON.stringify(attemptResponse.data), { expires: 7 });
 

@@ -1,28 +1,28 @@
 #include<bits/stdc++.h>
 using namespace std;
 void solve(){
-    int w,h,a,b;
-    int x1,y1,x2,y2;
-    cin>>w>>h>>a>>b;
-    cin>>x1>>y1>>x2>>y2;
-    if(x1>x2){
-        swap(x1,x2);
+    long long n,x,y;
+    cin>>n>>x>>y;
+    long long odd=0;
+    for(long long i=0;i<n;i++){
+        long long tem;
+        cin>>tem;
+        if(tem%2!=0)odd++;
     }
-    int c1=x1+a-x2;
-    if(y1>y2){
-        swap(y1,y2);
+    if(x%2!=0)odd++;
+    if(odd%2==0&& y%2==0){
+        cout<<"Alice"<<endl;
     }
-    int c2=y1+b-y2;
-    if(c1%a==0||c2%b==0){
-        cout<<"YES"<<endl;
+    else if(odd%2!=0 && y%2!=0){
+        cout<<"Alice"<<endl;
     }
     else{
-        cout<<"NO"<<endl;
-    } 
+        cout<<"Bob"<<endl;
+    }
+
 }
-int main()
-{
-    int t;
+int main(){
+    long long t;
     cin>>t;
     while(t--){
         solve();

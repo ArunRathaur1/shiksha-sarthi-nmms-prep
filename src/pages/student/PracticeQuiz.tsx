@@ -43,7 +43,7 @@ const [answers, setAnswers] = useState<{ [questionId: string]: string }>({});
         console.log(studentCookie)
         const parsed = studentCookie ? JSON.parse(studentCookie) : null;
         const className = parsed?.student?.class || parsed?.class || null;
-        const res = await axios.get(`http://localhost:5000/questions/${className}/${subject}/${topic}`);
+        const res = await axios.get(`https://shiksha-sarthi-nmms-prep-cn64.vercel.app/questions/${className}/${subject}/${topic}`);
         setQuestions(res.data);
         setStartTime(Date.now());
         setQuestionStartTime(Date.now());

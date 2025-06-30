@@ -49,8 +49,8 @@ const SingleQuizReport: React.FC = () => {
         const studentId = student.student.studentId;
 
         const [studentRes, quizRes] = await Promise.all([
-          axios.get(`http://localhost:5000/students/${studentId}`),
-          axios.get(`http://localhost:5000/quizzes/${id}`),
+          axios.get(`https://shiksha-sarthi-nmms-prep-cn64.vercel.app/students/${studentId}`),
+          axios.get(`https://shiksha-sarthi-nmms-prep-cn64.vercel.app/quizzes/${id}`),
         ]);
 
         const studentData = studentRes.data;

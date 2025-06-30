@@ -71,7 +71,7 @@ export default function AddMyQuestion() {
       };
 
       const response = await axios.post(
-       "http://localhost:5000/questions/teacher",
+       "https://shiksha-sarthi-nmms-prep-cn64.vercel.app/questions/teacher",
         payload
       );
 
