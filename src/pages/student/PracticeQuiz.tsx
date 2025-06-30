@@ -20,11 +20,12 @@ interface Question {
 const PracticeQuiz: React.FC = () => {
   const { subject, topic } = useParams<{ subject: string; topic: string }>();
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [current, setCurrent] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
-  const [answers, setAnswers] = useState<
-    { questionId: string; selected: string; isCorrect: boolean }[]
-  >([]);
+const [current, setCurrent] = useState(0); 
+
+// 🔁 Replace this:
+const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+const [answers, setAnswers] = useState<{ [questionId: string]: string }>({});
+
   const [startTime, setStartTime] = useState<number | null>(null);
   const [endTime, setEndTime] = useState<number | null>(null);
   const [questionStartTime, setQuestionStartTime] = useState<number | null>(null);
@@ -55,72 +56,86 @@ const PracticeQuiz: React.FC = () => {
     fetchQuestions();
   }, [subject, topic]);
 
-  const handleAnswer = (option: string) => {
-    if (selectedAnswer !== null) return;
+ const handleAnswer = (option: string) => {
+  if (selectedAnswer !== null) return;
 
-    const currentQuestion = questions[current];
-    const isCorrect = option === currentQuestion.correctAnswer;
+  const currentQuestion = questions[current];
+  const questionId = currentQuestion._id;
 
-    setSelectedAnswer(option);
-    setAnswers((prev) => [
-      ...prev,
-      { questionId: currentQuestion._id, selected: option, isCorrect },
-    ]);
-    setAttemptedQuestions(prev => new Set(prev).add(current));
-    
-    setShowFeedback(true);
-  };
+  const isCorrect = option === currentQuestion.correctAnswer;
 
-  const handleNext = () => {
-    // Reset states for next question
-    setSelectedAnswer(null);
+  setSelectedAnswer(option);
+
+  setAnswers(prev => ({
+    ...prev,
+    [questionId]: option
+  }));
+
+  setAttemptedQuestions(prev => new Set(prev).add(current));
+  setShowFeedback(true);
+};
+
+
+ const handleNext = () => {
+  if (current < questions.length - 1) {
+    const nextIndex = current + 1;
+    const nextQuestionId = questions[nextIndex]._id;
+
+    setCurrent(nextIndex);
+    setSelectedAnswer(answers[nextQuestionId] || null);
     setShowFeedback(false);
     setShowHint(false);
-    
-    // Check if this is the last question
-    if (current < questions.length - 1) {
-      setCurrent(current + 1);
-      setQuestionStartTime(Date.now()); // Reset question timer
-    } else {
-      // Quiz is completed
-      setEndTime(Date.now());
-      setQuizCompleted(true);
-    }
-  };
+    setQuestionStartTime(Date.now());
+  } else {
+    setEndTime(Date.now());
+    setQuizCompleted(true);
+  }
+};
 
-  const handleSkip = () => {
-    setSelectedAnswer(null);
+const handlePrevious = () => {
+  if (current > 0) {
+    const prevIndex = current - 1;
+    const prevQuestionId = questions[prevIndex]._id;
+
+    setCurrent(prevIndex);
+    setSelectedAnswer(answers[prevQuestionId] || null);
     setShowFeedback(false);
     setShowHint(false);
-    
-    // Check if this is the last question
-    if (current < questions.length - 1) {
-      setCurrent(current + 1);
-      setQuestionStartTime(Date.now()); // Reset question timer
-    } else {
-      // Quiz is completed
-      setEndTime(Date.now());
-      setQuizCompleted(true);
-    }
-  };
+  }
+};
 
-  const getResult = () => {
-    const correct = answers.filter((a) => a.isCorrect).length;
-    const incorrect = answers.filter((a) => !a.isCorrect).length;
-    const unattempted = questions.length - answers.length;
-    
-    // Calculate total time properly
-    const totalTime = endTime && startTime ? (endTime - startTime) / 1000 : 0;
-    
-    // Calculate average time per question based on total questions attempted/viewed
-    // This includes both answered and skipped questions
-    const questionsAttempted = quizCompleted ? questions.length : current + 1;
-    const avgTime = questionsAttempted > 0 ? totalTime / questionsAttempted : 0;
-    
-    const score = questions.length > 0 ? Math.round((correct / questions.length) * 100) : 0;
 
-    return { correct, incorrect, unattempted, totalTime, avgTime, score };
-  };
+ 
+const handleSkip = () => {
+  if (current < questions.length - 1) {
+    const nextIndex = current + 1;
+    const nextQuestionId = questions[nextIndex]._id;
+
+    setCurrent(nextIndex);
+    setSelectedAnswer(answers[nextQuestionId] || null);
+    setShowFeedback(false);
+    setShowHint(false);
+    setQuestionStartTime(Date.now());
+  } else {
+    setEndTime(Date.now());
+    setQuizCompleted(true);
+  }
+};
+
+
+const getResult = () => {
+  const correct = questions.filter(q => answers[q._id] === q.correctAnswer).length;
+  const incorrect = Object.keys(answers).length - correct;
+  const unattempted = questions.length - Object.keys(answers).length;
+
+  const totalTime = endTime && startTime ? (endTime - startTime) / 1000 : 0;
+  const questionsAttempted = quizCompleted ? questions.length : current + 1;
+  const avgTime = questionsAttempted > 0 ? totalTime / questionsAttempted : 0;
+  const score = questions.length > 0 ? Math.round((correct / questions.length) * 100) : 0;
+
+  return { correct, incorrect, unattempted, totalTime, avgTime, score };
+};
+
 
   // Helper function to check if hint exists and has content
   const hasHint = (question: Question) => {
@@ -386,25 +401,36 @@ const PracticeQuiz: React.FC = () => {
                 </div>
               )}
 
-              {/* Action Buttons */}
-              <div className="mt-6 flex gap-3">
-                {selectedAnswer ? (
-                  <button
-                    onClick={handleNext}
-                    className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg"
-                  >
-                    {current === questions.length - 1 ? "Finish Quiz 🎯" : "Next Question →"}
-                  </button>
-                ) : (
-                  <button
-                    onClick={handleSkip}
-                    className="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 text-white py-3 px-6 rounded-lg font-medium hover:from-gray-600 hover:to-gray-700 transition-all duration-200 shadow-lg flex items-center justify-center gap-2"
-                  >
-                    <SkipForward size={18} />
-                    {current === questions.length - 1 ? "Finish Quiz" : "Skip Question"}
-                  </button>
-                )}
-              </div>
+             {/* Action Buttons */}
+<div className="mt-6 flex gap-3">
+  {/* Show Previous button only if not on the first question */}
+  {current > 0 && (
+    <button
+      onClick={handlePrevious}
+      className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white py-3 px-6 rounded-lg font-medium hover:from-yellow-600 hover:to-yellow-700 transition-all duration-200 shadow-lg flex items-center justify-center gap-2"
+    >
+      ← Previous
+    </button>
+  )}
+
+  {selectedAnswer ? (
+    <button
+      onClick={handleNext}
+      className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg"
+    >
+      {current === questions.length - 1 ? "Finish Quiz 🎯" : "Next Question →"}
+    </button>
+  ) : (
+    <button
+      onClick={handleSkip}
+      className="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 text-white py-3 px-6 rounded-lg font-medium hover:from-gray-600 hover:to-gray-700 transition-all duration-200 shadow-lg flex items-center justify-center gap-2"
+    >
+      <SkipForward size={18} />
+      {current === questions.length - 1 ? "Finish Quiz" : "Skip Question"}
+    </button>
+  )}
+</div>
+
             </div>
           </div>
         ) : (
@@ -520,7 +546,7 @@ const PracticeQuiz: React.FC = () => {
                   // Reset quiz state
                   setCurrent(0);
                   setQuizCompleted(false);
-                  setAnswers([]);
+                  setAnswers({});
                   setSelectedAnswer(null);
                   setShowFeedback(false);
                   setShowHint(false);
