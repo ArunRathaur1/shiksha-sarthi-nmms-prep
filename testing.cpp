@@ -1,25 +1,28 @@
 #include<bits/stdc++.h>
 using namespace std;
 void solve(){
-   int k;
-   cin>>k;
-    if(k>=0&&k<=9){
-        cout<<k<<endl;
+    long long n,x,y;
+    cin>>n>>x>>y;
+    long long odd=0;
+    for(long long i=0;i<n;i++){
+        long long tem;
+        cin>>tem;
+        if(tem%2!=0)odd++;
     }
-    else if(k>=10&& k<99){
-        k=k-9;
-        int p=k/2;
-        if(p*2==k){
-            cout<<(p+9)%10<<endl;
-        }
-        else{
-            cout<<(p+9)/10<<endl;
-        }
+    if(x%2!=0)odd++;
+    if(odd%2==0&& y%2==0){
+        cout<<"Alice"<<endl;
     }
+    else if(odd%2!=0 && y%2!=0){
+        cout<<"Alice"<<endl;
+    }
+    else{
+        cout<<"Bob"<<endl;
+    }
+
 }
-int main()
-{
-    int t;
+int main(){
+    long long t;
     cin>>t;
     while(t--){
         solve();

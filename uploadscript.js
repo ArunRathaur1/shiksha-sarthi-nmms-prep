@@ -2,108 +2,88 @@ import fetch from "node-fetch";
 
 const questions = [
   {
-    subject: "सामाजिक विज्ञान",
+    subject: "गणित",
     class: "NMMS",
-    topic: "देश पर शासन करना (Ruling the Countryside)",
-    question: "ज़मींदारी प्रणाली का मुख्य उद्देश्य क्या था?",
-    questionImage:
-      "https://res.cloudinary.com/dmebh0vcd/image/upload/v1750418808/Screenshot_2025-06-20_165623_zshx97.png",
-    options: [
-      "किसानों को अधिकार देना",
-      "भूमि का सर्वेक्षण करना",
-      "राजस्व संग्रह में स्थिरता लाना",
-      "कारखानों की स्थापना करना",
-    ],
-    correctAnswer: "राजस्व संग्रह में स्थिरता लाना",
-    hint: {
-      text: "यह प्रणाली राजस्व निश्चित करने के लिए बनाई गई थी।",
-      image: "",
-      video: "",
-    },
-  },
-  {
-    subject: "सामाजिक विज्ञान",
-    class: "NMMS",
-    topic: "देश पर शासन करना (Ruling the Countryside)",
+    topic: "प्रत्यक्ष और परोक्ष अनुपात",
     question:
-      "किस कृषि प्रणाली में गाँव के कुल राजस्व का निर्धारण किया जाता था?",
+      "एक स्कूल में 20 बच्चों को भोजन बनाने में 4 किलोग्राम चावल लगता है। यदि बच्चों की संख्या 50 हो जाए, तो कितना चावल लगेगा?",
     questionImage:
-      "https://res.cloudinary.com/dmebh0vcd/image/upload/v1750418828/Screenshot_2025-06-20_165635_nx601a.png",
-    options: [
-      "रैयतवारी प्रणाली",
-      "महलवारी प्रणाली",
-      "स्थायी बंदोबस्त",
-      "संस्थान व्यवस्था",
-    ],
-    correctAnswer: "महलवारी प्रणाली",
+      "https://res.cloudinary.com/dmebh0vcd/image/upload/v1751281636/Screenshot_2025-06-30_163708_hebjcd.png",
+    options: ["6 किलोग्राम", "8 किलोग्राम", "10 किलोग्राम", "12 किलोग्राम"],
+    correctAnswer: "10 किलोग्राम",
     hint: {
-      text: "इसमें गाँव को एक इकाई मानकर कर निर्धारित किया जाता था।",
+      text: "बच्चों की संख्या बढ़ेगी, तो चावल की मात्रा भी बढ़ेगी — प्रत्यक्ष अनुपात।",
       image: "",
       video: "",
     },
   },
   {
-    subject: "सामाजिक विज्ञान",
+    subject: "गणित",
     class: "NMMS",
-    topic: "देश पर शासन करना (Ruling the Countryside)",
-    question: "नील आयोग की स्थापना क्यों की गई थी?",
-    questionImage:
-      "https://res.cloudinary.com/dmebh0vcd/image/upload/v1750418887/Screenshot_2025-06-20_165757_rglu2c.png",
-    options: [
-      "नए कर लागू करने के लिए",
-      "किसानों की शिकायतों की जांच करने के लिए",
-      "जमींदारों की सहायता करने के लिए",
-      "ब्रिटिश अफसरों को पुरस्कृत करने के लिए",
-    ],
-    correctAnswer: "किसानों की शिकायतों की जांच करने के लिए",
-    hint: {
-      text: "यह आयोग किसानों द्वारा नील की जबरन खेती के विरोध के बाद बना था।",
-      image: "",
-      video: "",
-    },
-  },
-  {
-    subject: "सामाजिक विज्ञान",
-    class: "NMMS",
-    topic: "देश पर शासन करना (Ruling the Countryside)",
-    question: "स्थायी बंदोबस्त किस क्षेत्र में लागू किया गया था?",
-    questionImage:
-      "https://res.cloudinary.com/dmebh0vcd/image/upload/v1750418938/Screenshot_2025-06-20_165824_tddwed.png",
-    options: [
-      "बंगाल, बिहार, उड़ीसा",
-      "पंजाब, हरियाणा",
-      "महाराष्ट्र, गुजरात",
-      "तमिलनाडु, आंध्र प्रदेश",
-    ],
-    correctAnswer: "बंगाल, बिहार, उड़ीसा",
-    hint: {
-      text: "यह प्रणाली पूर्वी भारत के क्षेत्रों में आरंभ की गई थी।",
-      image: "",
-      video: "",
-    },
-  },
-  {
-    subject: "सामाजिक विज्ञान",
-    class: "NMMS",
-    topic: "देश पर शासन करना (Ruling the Countryside)",
+    topic: "प्रत्यक्ष और परोक्ष अनुपात",
     question:
-      "ब्रिटिश सरकार द्वारा की गई नील की खेती ने किसे सबसे अधिक प्रभावित किया?",
+      "5 बच्चे एक काम को 15 दिनों में पूरा करते हैं। यदि 10 बच्चे वही काम करें, तो कितने दिन लगेंगे?",
     questionImage:
-      "https://res.cloudinary.com/dmebh0vcd/image/upload/v1750418964/Screenshot_2025-06-20_165903_lsjjjj.png",
-    options: [
-      "जमींदारों को",
-      "ब्रिटिश व्यापारियों को",
-      "भारतीय किसानों को",
-      "नगरपालिका को",
-    ],
-    correctAnswer: "भारतीय किसानों को",
+      "https://res.cloudinary.com/dmebh0vcd/image/upload/v1751281756/Screenshot_2025-06-30_163903_pqyzql.png",
+    options: ["10", "8", "7", "7.5"],
+    correctAnswer: "7.5",
     hint: {
-      text: "किसानों को जबरन नील उगाने पर मजबूर किया गया जिससे उनकी स्थिति खराब हो गई।",
+      text: "बच्चे ज़्यादा = समय कम — परोक्ष अनुपात।",
+      image: "",
+      video: "",
+    },
+  },
+  {
+    subject: "गणित",
+    class: "NMMS",
+    topic: "प्रत्यक्ष और परोक्ष अनुपात",
+    question:
+      "एक दुकानदार 3 घंटे में 90 समोसे बनाता है। उसी दर से 5 घंटे में वह कितने समोसे बनाएगा?",
+    questionImage:
+      "https://res.cloudinary.com/dmebh0vcd/image/upload/v1751281848/Screenshot_2025-06-30_164036_tmu0jb.png",
+    options: ["100", "120", "150", "180"],
+    correctAnswer: "150",
+    hint: {
+      text: "समय ज़्यादा = समोसे ज़्यादा — प्रत्यक्ष अनुपात।",
+      image: "",
+      video: "",
+    },
+  },
+  {
+    subject: "गणित",
+    class: "NMMS",
+    topic: "प्रत्यक्ष और परोक्ष अनुपात",
+    question:
+      "एक साइकिल 2 घंटे में 30 किमी जाती है। यदि वह 4 घंटे चले, तो कितनी दूरी तय करेगी?",
+    questionImage:
+      "https://res.cloudinary.com/dmebh0vcd/image/upload/v1751281946/Screenshot_2025-06-30_164218_yltio8.png",
+    options: ["40 किमी", "45 किमी", "50 किमी", "60 किमी"],
+    correctAnswer: "60 किमी",
+    hint: {
+      text: "समय बढ़ेगा, तो दूरी भी बढ़ेगी — प्रत्यक्ष अनुपात।",
+      image: "",
+      video: "",
+    },
+  },
+  {
+    subject: "गणित",
+    class: "NMMS",
+    topic: "प्रत्यक्ष और परोक्ष अनुपात",
+    question:
+      "एक मशीन 10 मिनट में 100 बोतलें बनाती है। यदि वैसी ही 2 मशीनें साथ चलें, तो वही काम कितने मिनट में पूरा होगा?",
+    questionImage:
+      "https://res.cloudinary.com/dmebh0vcd/image/upload/v1751282124/Screenshot_2025-06-30_164515_fkryig.png",
+    options: ["20 मिनट", "15 मिनट", "10 मिनट", "5 मिनट"],
+    correctAnswer: "5 मिनट",
+    hint: {
+      text: "मशीनें ज़्यादा = समय कम — परोक्ष अनुपात।",
       image: "",
       video: "",
     },
   },
 ];
+
+
 
 async function uploadQuestion(question) {
   try {
