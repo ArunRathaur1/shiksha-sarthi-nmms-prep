@@ -48,7 +48,7 @@ const StudentDashboard: React.FC = () => {
 
         if (studentId) {
           axios
-            .get(`http://localhost:5000/students/${studentId}`)
+            .get(`https://shiksha-sarthi-nmms-prep-cn64.vercel.app/students/${studentId}`)
             .then((res) => {
               setStudent(res.data);
             })

@@ -40,8 +40,8 @@ const Login: React.FC = () => {
 
       const url =
         role === "student"
-          ? "http://localhost:5000/students/login"
-          : "http://localhost:5000/teachers/login";
+          ? "https://shiksha-sarthi-nmms-prep-cn64.vercel.app/students/login"
+          : "https://shiksha-sarthi-nmms-prep-cn64.vercel.app/teachers/login";
 
       const payload =
         role === "student"

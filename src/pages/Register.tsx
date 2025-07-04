@@ -84,8 +84,8 @@ const Register: React.FC = () => {
         };
 
     const url = role === 'student'
-      ? 'http://localhost:5000/students'
-      : 'http://localhost:5000/teachers';
+      ? 'https://shiksha-sarthi-nmms-prep-cn64.vercel.app/students'
+      : 'https://shiksha-sarthi-nmms-prep-cn64.vercel.app/teachers';
 
     try {
       setIsLoading(true);
