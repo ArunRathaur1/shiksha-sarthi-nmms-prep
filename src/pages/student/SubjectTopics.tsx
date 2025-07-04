@@ -14,7 +14,7 @@ const SubjectTopics: React.FC = () => {
   const [topics, setTopics] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedSub, setSelectedSub] = useState("Physics");
+  const [selectedSub, setSelectedSub] = useState("भौतिकी");
 
   // 🧠 Manually define topics for Physics, Chemistry, and Biology
 const chemistryTopics = [
@@ -191,15 +191,15 @@ const physicsTopics = [
     </div>
   );
 
-  const scienceCategories = ["Physics", "Chemistry", "Biology"];
+  const scienceCategories = ["भौतिकी", "रसायन", "जीवविज्ञान"];
 
  const getFilteredScienceTopics = () => {
   if (subject !== "विज्ञान") return topics;
 
   const map: Record<string, string[]> = {
-    Physics: physicsTopics,
-    Chemistry: chemistryTopics,
-    Biology: biologyTopics,
+    भौतिकी: physicsTopics,
+    रसायन: chemistryTopics,
+    जीवविज्ञान: biologyTopics,
   };
 
   const allowedTopics = map[selectedSub] || [];
