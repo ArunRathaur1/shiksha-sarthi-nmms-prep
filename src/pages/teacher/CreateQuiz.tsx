@@ -82,40 +82,45 @@ export default function CreateQuiz() {
     } else {
       setCustomForm({ ...customForm, [e.target.name]: e.target.value });
     }
+    console.log("Correct Answer selected:", e.target.value);
+
   };
 
   const addCustomQuestionLocally = () => {
-    const { question, questionImage, options, correctAnswer } = customForm;
-    if (!question || !correctAnswer || options.includes("")) {
-      return toast({
-        title: "Error",
-        description: "Please fill all fields for the custom question",
-        variant: "destructive",
-      });
-    }
+  const { question, questionImage, options, correctAnswer } = customForm;
 
-    const tempId = `custom-${Date.now()}`;
-    const newQ = {
-      _id: tempId,
-      question,
-      questionImage,
-      options,
-      subject: "custom",
-      class: "custom",
-      topic: "custom",
-      teacherId,
-    };
-
-    setCustomQuestions([...customQuestions, newQ]);
-    setSelectedQuestions([...selectedQuestions, tempId]);
-    setCustomForm({
-      question: "",
-      questionImage: "",
-      options: ["", "", "", ""],
-      correctAnswer: "",
+  if (!question || !correctAnswer || options.includes("") || !options.includes(correctAnswer)) {
+    return toast({
+      title: "Error",
+      description: "Please fill all fields and select a valid correct answer",
+      variant: "destructive",
     });
-    setShowCustomForm(false);
+  }
+
+  const tempId = `custom-${Date.now()}`;
+  const newQ = {
+    _id: tempId,
+    question,
+    questionImage,
+    options,
+    correctAnswer, // ✅ Save correctAnswer correctly
+    subject: "custom",
+    class: "custom",
+    topic: "custom",
+    teacherId,
   };
+
+  setCustomQuestions([...customQuestions, newQ]);
+  setSelectedQuestions([...selectedQuestions, tempId]);
+  setCustomForm({
+    question: "",
+    questionImage: "",
+    options: ["", "", "", ""],
+    correctAnswer: "",
+  });
+  setShowCustomForm(false);
+};
+
 
   const handleSubmit = async () => {
     if (!teacherId || !quizId.trim()) {
@@ -146,9 +151,7 @@ export default function CreateQuiz() {
             question: q.question,
             questionImage: q.questionImage,
             options: q.options,
-            correctAnswer: q.options.includes(q.correctAnswer)
-              ? q.correctAnswer
-              : q.options[0], // default fallback
+            correctAnswer: q.correctAnswer, // default fallback
             teacherId,
           }
         );
