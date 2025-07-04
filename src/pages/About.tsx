@@ -7,53 +7,52 @@ import { BookOpen, Award, GraduationCap, BookText } from 'lucide-react';
 const About: React.FC = () => {
   const sections = [
     {
-      title: "What is NMMS?",
+      title: "NMMS क्या है?",
       icon: <BookOpen className="h-8 w-8 sm:h-10 sm:w-10 text-edu-blue mb-4" />,
       content: `
-        The National Means-cum-Merit Scholarship (NMMS) is a Central Sector Scheme that provides scholarships to 
-        meritorious students from economically weaker sections to reduce dropout rates in class VIII and encourage 
-        them to continue their education at the secondary stage.
+        राष्ट्रीय साधन-सह-मेधा छात्रवृत्ति (NMMS) एक केंद्रीय क्षेत्र योजना है जो आर्थिक रूप से कमजोर वर्गों के मेधावी छात्रों को छात्रवृत्ति प्रदान करती है
+        ताकि कक्षा 8 में ड्रॉपआउट दर को कम किया जा सके और उन्हें माध्यमिक स्तर पर अपनी पढ़ाई जारी रखने के लिए प्रोत्साहित किया जा सके।
       `
     },
     {
-      title: "Eligibility Criteria",
+      title: "पात्रता मानदंड",
       icon: <Award className="h-8 w-8 sm:h-10 sm:w-10 text-edu-purple mb-4" />,
       content: `
-        • Students must be studying in Class VIII in a government, local body, or government-aided school.
-        • Parental income should not exceed ₹3,50,000 per annum.
-        • Students must score at least 55% marks (50% for SC/ST) in Class VII annual exam.
-        • The student must pass a two-tier merit test conducted by the respective state/UT.
+        • छात्र किसी सरकारी, स्थानीय निकाय या सरकारी सहायता प्राप्त स्कूल में कक्षा 8 में अध्ययनरत होना चाहिए।
+        • माता-पिता की वार्षिक आय ₹3,50,000 से अधिक नहीं होनी चाहिए।
+        • कक्षा 7 की वार्षिक परीक्षा में न्यूनतम 55% अंक (SC/ST के लिए 50%) प्राप्त करने चाहिए।
+        • राज्य/संघ राज्य क्षेत्र द्वारा आयोजित दो-स्तरीय मेरिट परीक्षा में उत्तीर्ण होना आवश्यक है।
       `
     },
     {
-      title: "Exam Pattern",
+      title: "परीक्षा पैटर्न",
       icon: <BookText className="h-8 w-8 sm:h-10 sm:w-10 text-edu-green mb-4" />,
       content: `
-        The NMMS exam consists of two parts:
-        
-        1. Mental Ability Test (MAT): 
-           • 90 multiple-choice questions
-           • Tests reasoning and critical thinking
-        
-        2. Scholastic Aptitude Test (SAT):
-           • 90 multiple-choice questions
-           • Covers Mathematics, Science, and Social Science
-        
-        Time: 90 minutes for each test
-        Total Marks: 180 (90 marks for each test)
-        Minimum qualifying marks: 40% (General), 32% (SC/ST/PH)
+        NMMS परीक्षा दो भागों में होती है:
+
+        1. मानसिक योग्यता परीक्षण (MAT):
+           • 90 बहुविकल्पीय प्रश्न
+           • तर्क शक्ति और विश्लेषणात्मक सोच की जांच
+
+        2. शैक्षणिक अभिरुचि परीक्षण (SAT):
+           • 90 बहुविकल्पीय प्रश्न
+           • गणित, विज्ञान और सामाजिक विज्ञान पर आधारित
+
+        समय: प्रत्येक परीक्षा के लिए 90 मिनट
+        कुल अंक: 180 (प्रत्येक के लिए 90 अंक)
+        न्यूनतम उत्तीर्ण अंक: सामान्य वर्ग - 40%, SC/ST/PH - 32%
       `
     },
     {
-      title: "Scholarship Benefits",
+      title: "छात्रवृत्ति लाभ",
       icon: <GraduationCap className="h-8 w-8 sm:h-10 sm:w-10 text-edu-yellow mb-4" />,
       content: `
-        • Scholarship amount: ₹12,000 per annum (₹1,000 per month)
-        • Duration: 4 years (from Classes IX to XII)
-        • Direct transfer to the student's bank account
-        • Helps cover educational expenses and reduces financial burden
-        
-        Around 1,00,000 scholarships are awarded to students nationwide each year.
+        • छात्रवृत्ति राशि: ₹12,000 प्रति वर्ष (₹1,000 प्रति माह)
+        • अवधि: 4 वर्ष (कक्षा 9 से 12 तक)
+        • सीधे छात्र के बैंक खाते में ट्रांसफर
+        • शैक्षणिक खर्च को कवर करने और वित्तीय बोझ को कम करने में सहायता
+
+        प्रतिवर्ष लगभग 1,00,000 छात्रवृत्तियाँ राष्ट्रीय स्तर पर प्रदान की जाती हैं।
       `
     }
   ];
@@ -64,17 +63,15 @@ const About: React.FC = () => {
 
       <main className="flex-1 py-10 bg-gray-50 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
-          {/* Heading */}
           <div className="text-center mb-10 px-2">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
-              About NMMS Examination
+              NMMS परीक्षा के बारे में
             </h1>
             <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto">
-              Learn more about the National Means-cum-Merit Scholarship scheme and how it helps talented students from economically weaker sections.
+              राष्ट्रीय साधन-सह-मेधा छात्रवृत्ति योजना के बारे में अधिक जानें और यह योजना आर्थिक रूप से कमजोर वर्गों के मेधावी छात्रों की कैसे मदद करती है।
             </p>
           </div>
 
-          {/* Sections */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 mb-12">
             {sections.map((section, index) => (
               <Card key={index} className="hover:shadow-md transition-shadow">
@@ -89,33 +86,32 @@ const About: React.FC = () => {
             ))}
           </div>
 
-          {/* FAQs */}
           <Card className="mb-12">
             <CardContent className="p-6 sm:p-8">
               <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center sm:text-left">
-                Frequently Asked Questions
+                अक्सर पूछे जाने वाले प्रश्न
               </h2>
               <div className="space-y-6 text-sm sm:text-base">
                 {[
                   {
-                    q: "When is the NMMS exam conducted?",
-                    a: "The NMMS examination is typically conducted in November each year. The exact date varies by state."
+                    q: "NMMS परीक्षा कब आयोजित की जाती है?",
+                    a: "NMMS परीक्षा आमतौर पर हर साल नवंबर में आयोजित की जाती है। सटीक तारीख राज्य के अनुसार भिन्न हो सकती है।"
                   },
                   {
-                    q: "How can I prepare for the NMMS exam?",
-                    a: "Prepare by studying NCERT textbooks for Classes 6-8, solving previous years' papers, and focusing on developing reasoning skills for the MAT section."
+                    q: "NMMS परीक्षा की तैयारी कैसे करें?",
+                    a: "कक्षा 6-8 की NCERT पुस्तकों का अध्ययन करें, पिछले वर्षों के प्रश्नपत्र हल करें और MAT सेक्शन के लिए तर्क शक्ति विकसित करें।"
                   },
                   {
-                    q: "How are the scholarships distributed?",
-                    a: "Scholarships are distributed to students based on their merit in the NMMS exam and the state-wise quota."
+                    q: "छात्रवृत्तियाँ कैसे वितरित की जाती हैं?",
+                    a: "NMMS परीक्षा में योग्यता और राज्य-वार कोटा के आधार पर छात्रवृत्तियाँ वितरित की जाती हैं।"
                   },
                   {
-                    q: "Can private school students apply for NMMS?",
-                    a: "No, only students studying in government, local body, or government-aided schools are eligible."
+                    q: "क्या प्राइवेट स्कूल के छात्र NMMS के लिए आवेदन कर सकते हैं?",
+                    a: "नहीं, केवल सरकारी, स्थानीय निकाय या सरकारी सहायता प्राप्त स्कूलों में पढ़ने वाले छात्र ही पात्र हैं।"
                   },
                   {
-                    q: "What documents are required for the NMMS application?",
-                    a: "Required documents include school certificate, income certificate of parents, caste certificate (if applicable), and bank account details of the student."
+                    q: "NMMS आवेदन के लिए कौन-कौन से दस्तावेज़ आवश्यक हैं?",
+                    a: "स्कूल प्रमाणपत्र, माता-पिता की आय प्रमाणपत्र, जाति प्रमाणपत्र (यदि लागू हो), और छात्र के बैंक खाते का विवरण आवश्यक होता है।"
                   }
                 ].map((faq, idx) => (
                   <div key={idx}>

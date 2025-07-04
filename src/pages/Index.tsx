@@ -18,23 +18,12 @@ const Index: React.FC = () => {
             <div className="flex flex-col md:flex-row items-center justify-between">
               <div className="md:w-1/2 mb-8 md:mb-0">
                 <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight">
-                  Prepare for NMMS Exam with Confidence
+                  आत्मविश्वास के साथ NMMS परीक्षा की तैयारी करें
                 </h1>
                 <p className="text-lg text-gray-700 mb-6">
-                  A comprehensive learning platform designed specifically for government school students of Classes 6, 7, and 8 to excel in the NMMS examination.
+                  कक्षा 6, 7, और 8 के सरकारी स्कूल के छात्रों के लिए विशेष रूप से डिज़ाइन किया गया एक व्यापक शिक्षण प्लेटफ़ॉर्म जो NMMS परीक्षा में उत्कृष्ट प्रदर्शन करने में मदद करता है।
                 </p>
-                <div className="flex flex-wrap gap-4">
-                  {/* <Link to="/register">
-                    <Button size="lg" className="bg-edu-blue hover:bg-edu-blue-dark">
-                      Join as Student
-                    </Button>
-                  </Link>
-                  <Link to="/register">
-                    <Button size="lg" variant="outline">
-                      Join as Teacher
-                    </Button>
-                  </Link> */}
-                </div>
+                <div className="flex flex-wrap gap-4"></div>
               </div>
               
               <div className="md:w-1/2 flex justify-center">
@@ -44,7 +33,7 @@ const Index: React.FC = () => {
                   <div className="bg-white p-6 rounded-lg shadow-lg z-10 relative">
                     <img 
                       src="https://img.freepik.com/free-vector/students-with-laptops-studying-online-course_74855-5293.jpg" 
-                      alt="Students learning online" 
+                      alt="ऑनलाइन पढ़ाई करते छात्र" 
                       className="w-64 h-64 object-cover rounded"
                     />
                   </div>
@@ -58,11 +47,10 @@ const Index: React.FC = () => {
         <section className="py-16 bg-white">
           <div className="edu-container">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4">What is NMMS?</h2>
+              <h2 className="text-3xl font-bold mb-4">NMMS क्या है?</h2>
               <p className="text-gray-700 max-w-3xl mx-auto">
-                The National Means-cum-Merit Scholarship (NMMS) is a centrally sponsored scholarship program aimed at 
-                providing financial assistance to meritorious students from economically weaker sections to reduce the 
-                dropout rate and encourage them to continue their education.
+                राष्ट्रीय साधन-सह-मेधा छात्रवृत्ति (NMMS) एक केंद्रीय प्रायोजित छात्रवृत्ति कार्यक्रम है जिसका उद्देश्य 
+                आर्थिक रूप से कमजोर वर्गों के मेधावी छात्रों को वित्तीय सहायता प्रदान करना और उन्हें अपनी पढ़ाई जारी रखने के लिए प्रेरित करना है।
               </p>
             </div>
             
@@ -70,23 +58,23 @@ const Index: React.FC = () => {
               {[
                 {
                   icon: <BookOpen className="h-12 w-12 mb-4 text-edu-blue" />,
-                  title: "Academic Excellence",
-                  description: "The scholarship promotes academic excellence and helps talented students continue their education."
+                  title: "शैक्षणिक उत्कृष्टता",
+                  description: "यह छात्रवृत्ति शैक्षणिक उत्कृष्टता को बढ़ावा देती है और मेधावी छात्रों को पढ़ाई जारी रखने में मदद करती है।"
                 },
                 {
                   icon: <Users className="h-12 w-12 mb-4 text-edu-purple" />,
-                  title: "Financial Support",
-                  description: "NMMS provides financial assistance to students from economically weaker sections."
+                  title: "वित्तीय सहायता",
+                  description: "NMMS आर्थिक रूप से कमजोर वर्गों के छात्रों को वित्तीय सहायता प्रदान करता है।"
                 },
                 {
                   icon: <FlaskConical className="h-12 w-12 mb-4 text-edu-green" />,
-                  title: "Comprehensive Subjects",
-                  description: "The exam tests students on Mathematics, Science, Social Science, and Mental Ability."
+                  title: "विषयों की व्यापकता",
+                  description: "यह परीक्षा गणित, विज्ञान, सामाजिक विज्ञान और मानसिक योग्यता पर आधारित होती है।"
                 },
                 {
                   icon: <Calculator className="h-12 w-12 mb-4 text-edu-yellow" />,
-                  title: "Competitive Exam",
-                  description: "NMMS is a competitive scholarship exam conducted at the state level for Class 8 students."
+                  title: "प्रतियोगी परीक्षा",
+                  description: "NMMS कक्षा 8 के छात्रों के लिए राज्य स्तर पर आयोजित की जाने वाली एक प्रतियोगी छात्रवृत्ति परीक्षा है।"
                 }
               ].map((item, index) => (
                 <Card key={index} className="border-none shadow-md hover:shadow-lg transition-shadow">
@@ -105,32 +93,32 @@ const Index: React.FC = () => {
         <section className="py-16 bg-gray-50">
           <div className="edu-container">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4">Our Features</h2>
+              <h2 className="text-3xl font-bold mb-4">हमारी विशेषताएं</h2>
               <p className="text-gray-700 max-w-3xl mx-auto">
-                Our platform offers a variety of features to help students prepare effectively for the NMMS exam.
+                हमारा प्लेटफॉर्म छात्रों को NMMS परीक्षा की प्रभावी तैयारी के लिए विभिन्न विशेषताएं प्रदान करता है।
               </p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {[
                 {
-                  title: "Practice Questions",
-                  description: "Access a vast repository of practice questions for Mathematics, Science, Social Science, and MAT.",
+                  title: "प्रैक्टिस प्रश्न",
+                  description: "गणित, विज्ञान, सामाजिक विज्ञान और मानसिक योग्यता के लिए एक विशाल प्रश्न बैंक तक पहुँच।",
                   image: "https://img.freepik.com/free-vector/tiny-students-sitting-near-books_74855-15547.jpg"
                 },
                 {
-                  title: "Teacher-Created Quizzes",
-                  description: "Teachers can create custom quizzes tailored to specific topics or areas of improvement.",
+                  title: "शिक्षक द्वारा बनाए गए क्विज़",
+                  description: "शिक्षक विशिष्ट विषयों या सुधार की आवश्यकता वाले क्षेत्रों के लिए कस्टम क्विज़ बना सकते हैं।",
                   image: "https://img.freepik.com/free-vector/teacher-concept-illustration_114360-1638.jpg"
                 },
                 {
-                  title: "Group Quiz Mode",
-                  description: "Study together with friends by attempting quizzes in groups of three to enhance collaborative learning.",
+                  title: "समूह क्विज़ मोड",
+                  description: "मित्रों के साथ समूह में क्विज़ हल करके सहयोगात्मक रूप से सीखें।",
                   image: "https://img.freepik.com/free-vector/students-watching-webinar-computer-studying-online_74855-15522.jpg"
                 },
                 {
-                  title: "Analytics & Progress Tracking",
-                  description: "Track your progress over time with detailed analytics on your performance in various subjects.",
+                  title: "विश्लेषण और प्रगति ट्रैकिंग",
+                  description: "विभिन्न विषयों में अपने प्रदर्शन पर विस्तृत विश्लेषण के साथ प्रगति पर नज़र रखें।",
                   image: "https://img.freepik.com/free-vector/data-inform-illustration-concept_114360-864.jpg"
                 }
               ].map((item, index) => (
@@ -146,7 +134,7 @@ const Index: React.FC = () => {
                     <h3 className="text-xl font-bold mb-2">{item.title}</h3>
                     <p className="text-gray-600 mb-4">{item.description}</p>
                     <Link to="/register">
-                      <Button variant="outline" size="sm">Learn More</Button>
+                      <Button variant="outline" size="sm">और जानें</Button>
                     </Link>
                   </div>
                 </div>
@@ -158,19 +146,19 @@ const Index: React.FC = () => {
         {/* CTA Section */}
         <section className="py-16 bg-edu-blue text-white">
           <div className="edu-container text-center">
-            <h2 className="text-3xl font-bold mb-4">Ready to Start Your NMMS Preparation?</h2>
+            <h2 className="text-3xl font-bold mb-4">क्या आप NMMS की तैयारी शुरू करने के लिए तैयार हैं?</h2>
             <p className="text-xl mb-8 max-w-3xl mx-auto">
-              Join thousands of students who are already using our platform to prepare for the NMMS exam.
+              हमारे प्लेटफॉर्म का उपयोग कर रहे हजारों छात्रों में शामिल हों और अपने सपनों को साकार करें।
             </p>
             <div className="flex justify-center gap-4">
               <Link to="/register">
                 <Button size="lg" variant="secondary">
-                  Register Now
+                  अभी पंजीकरण करें
                 </Button>
               </Link>
               <Link to="/login">
                 <Button size="lg" variant="outline" className="bg-transparent border-white hover:bg-white/20">
-                  Login
+                  लॉगिन करें
                 </Button>
               </Link>
             </div>

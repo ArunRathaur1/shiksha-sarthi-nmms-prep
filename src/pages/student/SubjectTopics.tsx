@@ -14,6 +14,36 @@ const SubjectTopics: React.FC = () => {
   const [topics, setTopics] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedSub, setSelectedSub] = useState("Physics");
+
+  // 🧠 Manually define topics for Physics, Chemistry, and Biology
+const chemistryTopics = [
+  "अम्ल, क्षारक एवं लवण",
+  "कार्बन, कोयला एवं पेट्रोलियम",
+  "कृत्रिम रेशे और प्लास्टिक",
+  "धातुएं और अधातुएं",
+  "रासायनिक अभिक्रिया",
+  "हवा"
+];
+
+const biologyTopics = [
+  "किशोरावस्था",
+  "कोशिका",
+  "चित्रण",
+  "सूक्ष्मजीव",
+  "फसल प्रबंधन"
+];
+
+const physicsTopics = [
+  "चुंबक",
+  "ताप संचरण",
+  "घर्षण",
+  "ध्वनि",
+  "प्रकाश",
+  "प्रकाश संश्लेषण",
+  "बल और दाब",
+  "विद्युत धारा"
+];
 
   useEffect(() => {
     const fetchTopics = async () => {
@@ -119,10 +149,71 @@ const SubjectTopics: React.FC = () => {
     </div>
   );
 
+  const renderTopicCards = (filteredTopics: string[]) => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {filteredTopics.map((topic, index) => (
+        <Card 
+          key={topic} 
+          className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-0 shadow-md bg-white/80 backdrop-blur-sm"
+        >
+          <CardHeader className="pb-3">
+            <div className="flex items-start justify-between">
+              <CardTitle className="text-lg font-semibold text-gray-800 group-hover:text-blue-700 transition-colors line-clamp-2">
+                {topic}
+              </CardTitle>
+              <Badge 
+                variant="outline" 
+                className="text-xs bg-gradient-to-r from-purple-100 to-blue-100 border-purple-200 text-purple-700"
+              >
+                #{index + 1}
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-0 pb-4">
+            <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
+              <BookOpen className="h-4 w-4" />
+              <span>प्रैक्टिस प्रश्न</span>
+            </div>
+          </CardContent>
+          <CardFooter className="pt-0">
+            <Link to={`/student/practice/${subject}/${topic}`} className="w-full">
+              <Button 
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-md hover:shadow-lg"
+                size="sm"
+              >
+                <Play className="h-4 w-4 mr-2" />
+                Start Quiz
+              </Button>
+            </Link>
+          </CardFooter>
+        </Card>
+      ))}
+    </div>
+  );
+
+  const scienceCategories = ["Physics", "Chemistry", "Biology"];
+
+ const getFilteredScienceTopics = () => {
+  if (subject !== "विज्ञान") return topics;
+
+  const map: Record<string, string[]> = {
+    Physics: physicsTopics,
+    Chemistry: chemistryTopics,
+    Biology: biologyTopics,
+  };
+
+  const allowedTopics = map[selectedSub] || [];
+
+  return allowedTopics.filter(topic => topics.includes(topic));
+};
+
+const filteredTopics = getFilteredScienceTopics();
+
+
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       <Header />
-      
+
       <main className="flex-1 py-8">
         <div className="edu-container">
           {/* Header Section */}
@@ -140,7 +231,7 @@ const SubjectTopics: React.FC = () => {
                 </p>
               </div>
             </div>
-            
+
             {!loading && !error && topics.length > 0 && (
               <div className="flex items-center gap-2">
                 <Badge variant="secondary" className="bg-blue-100 text-blue-800">
@@ -150,59 +241,30 @@ const SubjectTopics: React.FC = () => {
             )}
           </div>
 
-          {/* Content */}
-          {loading && <LoadingState />}
-          {error && <ErrorState />}
-          {!loading && !error && topics.length === 0 && <EmptyState />}
-
-          {!loading && !error && topics.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {topics.map((topic, index) => (
-                <Card 
-                  key={topic} 
-                  className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-0 shadow-md bg-white/80 backdrop-blur-sm"
+          {/* Science Subject Tabs */}
+          {subject === "विज्ञान" && (
+            <div className="flex gap-4 mb-6">
+              {scienceCategories.map((sub) => (
+                <Button
+                  key={sub}
+                  variant={selectedSub === sub ? "default" : "outline"}
+                  onClick={() => setSelectedSub(sub)}
                 >
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between">
-                      <CardTitle className="text-lg font-semibold text-gray-800 group-hover:text-blue-700 transition-colors line-clamp-2">
-                        {topic}
-                      </CardTitle>
-                      <Badge 
-                        variant="outline" 
-                        className="text-xs bg-gradient-to-r from-purple-100 to-blue-100 border-purple-200 text-purple-700"
-                      >
-                        #{index + 1}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  
-                  <CardContent className="pt-0 pb-4">
-                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
-                      <BookOpen className="h-4 w-4" />
-                      <span>प्रैक्टिस प्रश्न</span>
-                    </div>
-                  </CardContent>
-
-                  <CardFooter className="pt-0">
-                    <Link to={`/student/practice/${subject}/${topic}`} className="w-full">
-                      <Button 
-                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-md hover:shadow-lg"
-                        size="sm"
-                      >
-                        <Play className="h-4 w-4 mr-2" />
-                        Start Quiz
-                      </Button>
-                    </Link>
-                  </CardFooter>
-                </Card>
+                  {sub}
+                </Button>
               ))}
             </div>
           )}
 
-          
+          {/* Content */}
+          {loading && <LoadingState />}
+          {error && <ErrorState />}
+          {!loading && !error && topics.length === 0 && <EmptyState />}
+          {!loading && !error && topics.length > 0 && renderTopicCards(filteredTopics)}
+
         </div>
       </main>
-      
+
       <Footer />
     </div>
   );
