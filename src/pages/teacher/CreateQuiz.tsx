@@ -244,14 +244,22 @@ export default function CreateQuiz() {
               className="w-full border p-2 mb-2 rounded"
             />
           ))}
-          <input
-            type="text"
+          <select
             name="correctAnswer"
-            placeholder="Correct Answer"
             value={customForm.correctAnswer}
             onChange={handleCustomFormChange}
-            className="w-full border p-2 mb-2 rounded"
-          />
+            className="w-full border p-2 mb-2 rounded bg-white"
+          >
+            <option value="">Select Correct Answer</option>
+            {customForm.options
+              .filter((opt) => opt.trim() !== "")
+              .map((opt, idx) => (
+                <option key={idx} value={opt}>
+                  {opt}
+                </option>
+              ))}
+          </select>
+
           <Button onClick={addCustomQuestionLocally}>Add to Quiz</Button>
         </div>
       )}
