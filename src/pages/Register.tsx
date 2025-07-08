@@ -34,7 +34,7 @@ const Register: React.FC = () => {
 
   const handleAdminLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (adminUsername === 'admin' && adminPassword === 'admin') {
+    if (adminUsername === '1234' && adminPassword === '1234') {
       setIsAdminVerified(true);
     } else {
       toast({

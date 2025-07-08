@@ -9,7 +9,7 @@ const Authorization: React.FC = () => {
   const navigate = useNavigate();
 
   const handleLogin = () => {
-    if (username === "admin" && password === "admin") {
+    if (username === "1234" && password === "1234") {
       navigate("/uploadquestion");
     } else {
       setError("Invalid credentials. Please enter correct credentials for both.");
