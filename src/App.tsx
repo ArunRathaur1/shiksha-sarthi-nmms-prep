@@ -38,6 +38,7 @@ import QuizAnalyticsPage from "./pages/teacher/QuizAnalyticsPage";
 
 //Quiz
 import AttemptQuiz from "./pages/student/AttemptQuiz";
+import Authorization from "./pages/Authorization";
 const queryClient = new QueryClient();
 
 const AppRoutes = () => {
@@ -47,6 +48,7 @@ const AppRoutes = () => {
       <Route path="/" element={<Index />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/authorization" element={<Authorization/>} />
       <Route path="/about" element={<About />} />
       <Route path="/not-authorized" element={<NotAuthorized />} />
       <Route path="/uploadquestion" element={<Upload_question />} />

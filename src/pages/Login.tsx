@@ -130,7 +130,7 @@ const Login: React.FC = () => {
 
             <div className="text-xs text-gray-500 space-y-0.5">
               <p>Demo credentials:</p>
-              <p>ID: 1001</p>
+              <p>ID: 1234</p>
               <p>Password: 1234</p>
             </div>
           </CardContent>
