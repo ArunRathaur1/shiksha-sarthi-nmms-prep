@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useToast } from "@/components/ui/use-toast"; // adjust path if needed
-
+const API_URL = import.meta.env.VITE_API_URL;
 export default function AddMyQuestion() {
   const [formData, setFormData] = useState({
     subject: "",
@@ -71,7 +71,7 @@ export default function AddMyQuestion() {
       };
 
       const response = await axios.post(
-       "https://shiksha-sarthi-nmms-prep-cn64.vercel.app/questions/teacher",
+       `${API_URL}/questions/teacher`,
         payload
       );
 

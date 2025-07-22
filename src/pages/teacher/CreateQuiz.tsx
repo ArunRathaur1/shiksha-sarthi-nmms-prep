@@ -3,7 +3,7 @@ import { useToast } from "@/components/ui/use-toast";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
-
+const API_URL = import.meta.env.VITE_API_URL;
 interface Question {
   _id: string;
   subject: string;
@@ -41,7 +41,7 @@ export default function CreateQuiz() {
       setTeacherId(parsed.teacher.teacherId);
 
       axios
-        .get("https://shiksha-sarthi-nmms-prep-cn64.vercel.app/questions/")
+        .get(`${API_URL}/questions/`)
         .then((res) => {
           const teacherQuestions = res.data.filter(
             (q: any) => !q.teacherId || q.teacherId === parsed.teacher.teacherId
@@ -134,7 +134,7 @@ export default function CreateQuiz() {
 
     try {
       // First, create the quiz without questions
-      const quizRes = await axios.post("https://shiksha-sarthi-nmms-prep-cn64.vercel.app/quizzes/", {
+      const quizRes = await axios.post(`${API_URL}/quizzes/`, {
         teacherId,
         quizId: quizId.trim(),
         questions: [],
@@ -146,7 +146,7 @@ export default function CreateQuiz() {
       const uploadedCustomIds = [];
       for (let q of customQuestions) {
         const res = await axios.post(
-          `https://shiksha-sarthi-nmms-prep-cn64.vercel.app/quizzes/${quizId}/custom-question`,
+          `${API_URL}/quizzes/${quizId}/custom-question`,
           {
             question: q.question,
             questionImage: q.questionImage,
@@ -163,7 +163,7 @@ export default function CreateQuiz() {
       const finalQuestionIds = [...realSelected, ...uploadedCustomIds];
 
       // Update quiz with all question IDs
-      await axios.put(`https://shiksha-sarthi-nmms-prep-cn64.vercel.app/quizzes/${createdQuiz._id}`, {
+      await axios.put(`${API_URL}/quizzes/${createdQuiz._id}`, {
         questions: finalQuestionIds,
       });
 

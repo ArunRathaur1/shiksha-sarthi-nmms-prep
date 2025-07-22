@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SubjectIcon from '@/components/SubjectIcon';
+const API_URL = import.meta.env.VITE_API_URL;
 import { 
   ArrowLeft, 
   BookOpen, 
@@ -33,8 +34,8 @@ const QuizDetails = () => {
   useEffect(() => {
     const fetchQuizDetails = async () => {
       try {
-        const response = await fetch(`https://shiksha-sarthi-nmms-prep-cn64.vercel.app/quizzes/${quizId}`);
-        
+        const response = await fetch(`${API_URL}/quizzes/${quizId}`);
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }

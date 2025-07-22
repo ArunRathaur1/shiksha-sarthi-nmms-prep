@@ -3,7 +3,7 @@ import { AlertCircle, BarChart3, CheckCircle, Clock, ExternalLink, Image, Lightb
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
-
+const API_URL = import.meta.env.VITE_API_URL;
 interface Question {
   _id: string;
   question: string;
@@ -43,7 +43,7 @@ const [answers, setAnswers] = useState<{ [questionId: string]: string }>({});
         console.log(studentCookie)
         const parsed = studentCookie ? JSON.parse(studentCookie) : null;
         const className = parsed?.student?.class || parsed?.class || null;
-        const res = await axios.get(`https://shiksha-sarthi-nmms-prep-cn64.vercel.app/questions/${className}/${subject}/${topic}`);
+        const res = await axios.get(`${API_URL}/questions/${className}/${subject}/${topic}`);
         setQuestions(res.data);
         setStartTime(Date.now());
         setQuestionStartTime(Date.now());

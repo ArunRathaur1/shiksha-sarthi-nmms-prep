@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-
+const API_URL = import.meta.env.VITE_API_URL;
 export default function StudentReport() {
   const { id } = useParams();
   const [student, setStudent] = useState(null);
@@ -15,7 +15,7 @@ export default function StudentReport() {
         setError(null);
 
         // Fetch student data
-        const resStudent = await fetch(`https://shiksha-sarthi-nmms-prep-cn64.vercel.app/students/${id}`);
+        const resStudent = await fetch(`${API_URL}/students/${id}`);
         if (!resStudent.ok) throw new Error("Failed to fetch student data");
         const studentData = await resStudent.json();
         setStudent(studentData);
@@ -30,7 +30,7 @@ export default function StudentReport() {
 
         // Fetch all questions in parallel
         const questionPromises = uniqueQuestionIds.map((qid) =>
-          fetch(`https://shiksha-sarthi-nmms-prep-cn64.vercel.app/questions/${qid}`).then((res) => {
+          fetch(`${API_URL}/questions/${qid}`).then((res) => {
             if (!res.ok) throw new Error(`Failed to fetch question ${qid}`);
             return res.json();
           })

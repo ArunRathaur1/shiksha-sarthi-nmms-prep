@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+const API_URL = import.meta.env.VITE_API_URL;
 import {
   Card,
   CardContent,
@@ -40,8 +41,8 @@ const Login: React.FC = () => {
 
       const url =
         role === "student"
-          ? "https://shiksha-sarthi-nmms-prep-cn64.vercel.app/students/login"
-          : "https://shiksha-sarthi-nmms-prep-cn64.vercel.app/teachers/login";
+          ? `${API_URL}/students/login`
+          : `${API_URL}/teachers/login`;
 
       const payload =
         role === "student"

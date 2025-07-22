@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Cookies from "js-cookie";
 import axios from "axios";
-
+const API_URL = import.meta.env.VITE_API_URL;
 interface Question {
   _id: string;
   question: string;
@@ -49,8 +49,8 @@ const SingleQuizReport: React.FC = () => {
         const studentId = student.student.studentId;
 
         const [studentRes, quizRes] = await Promise.all([
-          axios.get(`https://shiksha-sarthi-nmms-prep-cn64.vercel.app/students/${studentId}`),
-          axios.get(`https://shiksha-sarthi-nmms-prep-cn64.vercel.app/quizzes/${id}`),
+          axios.get(`${API_URL}/students/${studentId}`),
+          axios.get(`${API_URL}/quizzes/${id}`),
         ]);
 
         const studentData = studentRes.data;

@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { BookOpen, Play, AlertCircle, Loader2 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-
+const API_URL = import.meta.env.VITE_API_URL;
 const SubjectTopics: React.FC = () => {
   const { subject } = useParams<{ subject: string }>();
   const [topics, setTopics] = useState<string[]>([]);
@@ -72,7 +72,7 @@ const physicsTopics = [
         }
 
         const res = await axios.get(
-          `https://shiksha-sarthi-nmms-prep-cn64.vercel.app/questions/topics/${className}/${subject}`
+          `${API_URL}/questions/topics/${className}/${subject}`
         );
 
         if (res.data && Array.isArray(res.data.topics)) {

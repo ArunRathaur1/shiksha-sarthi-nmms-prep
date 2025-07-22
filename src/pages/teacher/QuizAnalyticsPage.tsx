@@ -868,7 +868,7 @@
 //     </div>
 //   );
 // }
-
+const API_URL = import.meta.env.VITE_API_URL;
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
@@ -914,8 +914,8 @@ export default function QuizAnalyticsPage() {
       try {
         setLoading(true);
         const [studentRes, quizRes] = await Promise.all([
-          axios.get(`https://shiksha-sarthi-nmms-prep-cn64.vercel.app/reports/student-quiz/${quizId}`),
-          axios.get(`https://shiksha-sarthi-nmms-prep-cn64.vercel.app/reports/quiz/${quizId}`)
+          axios.get(`${API_URL}/reports/student-quiz/${quizId}`),
+          axios.get(`${API_URL}/reports/quiz/${quizId}`)
         ]);
 
         const studentReportsData = studentRes.data;
@@ -926,7 +926,7 @@ export default function QuizAnalyticsPage() {
         const uniqueStudentIds = [...new Set(studentReportsData.map(report => report.studentId))];
         const namePromises = uniqueStudentIds.map(async (studentId) => {
           try {
-            const response = await axios.get(`https://shiksha-sarthi-nmms-prep-cn64.vercel.app/students/${studentId}`);
+            const response = await axios.get(`${API_URL}/students/${studentId}`);
             return { studentId, name: response.data.name || response.data.fullName || 'Unknown' };
           } catch (error) {
             console.error(`Error fetching student ${studentId}:`, error);

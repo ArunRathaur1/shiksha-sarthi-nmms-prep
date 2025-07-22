@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-
+const API_URL = import.meta.env.VITE_API_URL;
 export default function LoginStudent() {
   const [id, setid] = useState("");
   const [password, setPassword] = useState("");
@@ -17,7 +17,7 @@ export default function LoginStudent() {
     console.log(id);
     console.log(password);
 
-    const url = "https://shiksha-sarthi-nmms-prep-cn64.vercel.app/students/login";
+    const url = `${API_URL}/students/login`;
     const payload = {
       studentId: id,
       password: password,

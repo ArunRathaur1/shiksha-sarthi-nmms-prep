@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useToast } from '@/components/ui/use-toast';
+const API_URL = import.meta.env.VITE_API_URL;
 import {
   Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle,
 } from '@/components/ui/card';
@@ -84,8 +85,8 @@ const Register: React.FC = () => {
         };
 
     const url = role === 'student'
-      ? 'https://shiksha-sarthi-nmms-prep-cn64.vercel.app/students'
-      : 'https://shiksha-sarthi-nmms-prep-cn64.vercel.app/teachers';
+      ? `${API_URL}/students`
+      : `${API_URL}/teachers`;
 
     try {
       setIsLoading(true);

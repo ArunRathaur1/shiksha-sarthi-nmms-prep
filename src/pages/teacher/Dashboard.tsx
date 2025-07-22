@@ -6,6 +6,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useAuth } from '@/contexts/AuthContext';
 import Cookies from 'js-cookie';
+const API_URL= import.meta.env.VITE_API_URL;
 import { 
   BookOpen, 
   ListChecks, 
@@ -57,8 +58,8 @@ const TeacherDashboard: React.FC = () => {
           throw new Error('Teacher ID not found in cookie');
         }
 
-        const response = await fetch(`https://shiksha-sarthi-nmms-prep-cn64.vercel.app/teachers/${teacherIdFromCookie}/quizzes`);
-        
+        const response = await fetch(`${API_URL}/teachers/${teacherIdFromCookie}/quizzes`);
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }

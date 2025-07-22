@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
+const API_URL = import.meta.env.VITE_API_URL;
 import {
   Card,
   CardContent,
@@ -48,7 +49,7 @@ const StudentDashboard: React.FC = () => {
 
         if (studentId) {
           axios
-            .get(`https://shiksha-sarthi-nmms-prep-cn64.vercel.app/students/${studentId}`)
+            .get(`${API_URL}/students/${studentId}`)
             .then((res) => {
               setStudent(res.data);
             })

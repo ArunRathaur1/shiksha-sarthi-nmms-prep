@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Cookies from "js-cookie";
 import Header from "@/components/Header";
-
+const API_URL = import.meta.env.VITE_API_URL;
 interface Question {
   _id: string;
   question: string;
@@ -46,7 +46,7 @@ const AttemptQuiz: React.FC = () => {
   useEffect(() => {
     const fetchQuiz = async () => {
       try {
-        const res = await axios.get(`https://shiksha-sarthi-nmms-prep-cn64.vercel.app/quizzes/${id}`);
+        const res = await axios.get(`${API_URL}/quizzes/${id}`);
         setQuiz(res.data);
       } catch (err) {
         console.error("Failed to fetch quiz:", err);
@@ -96,11 +96,11 @@ const AttemptQuiz: React.FC = () => {
 
     try {
       const attemptResponse = await axios.patch(
-        `https://shiksha-sarthi-nmms-prep-cn64.vercel.app/students/${student.studentId}/attempt-quiz`,
+        `${API_URL}/students/${student.studentId}/attempt-quiz`,
         quizAttemptPayload
       );
 
-      await axios.post(`https://shiksha-sarthi-nmms-prep-cn64.vercel.app/reports/submit-report`, reportPayload);
+      await axios.post(`${API_URL}/reports/submit-report`, reportPayload);
 
       Cookies.set("quizResult", JSON.stringify(attemptResponse.data), { expires: 7 });
 
