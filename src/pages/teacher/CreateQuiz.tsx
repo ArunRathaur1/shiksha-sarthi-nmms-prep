@@ -133,7 +133,7 @@ export default function CreateQuiz() {
     }
 
     try {
-      // First, create the quiz without questions
+      // First, create the quiz without questions testing
       const quizRes = await axios.post(`${API_URL}/quizzes/`, {
         teacherId,
         quizId: quizId.trim(),
